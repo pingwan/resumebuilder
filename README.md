@@ -10,6 +10,12 @@ The idea behind all these classes is the following:
 *   Entries - For example the schools and businesses
 *   Items - More detailed information about e.g. the job, such as function description.
 
+# Development resources
+Next to all the details that are described below, some useful resources for the development.
+*   [Material.js](https://material.angularjs.org/#/) - Note that we use Material design instead of (the default) Bootstrap.
+*   [Mean.js](http://meanjs.org/generator.html) - The CLI commands to generate models (look for CRUD module)
+*   [Bossable](http://www.bossable.com/category/mean-stack-challenge/) - I found this a really nice introduction to mean.js. Sometimes it is a bit tedious but overall really clear. 
+*   [Webstorm](https://www.jetbrains.com/webstorm/) - In my opinion on of the best editors for MEAN stack.
 
 * * *
 [![MEAN.JS Logo](http://meanjs.org/img/logo-small.png)](http://meanjs.org/)
