@@ -1,3 +1,17 @@
+# Models
+Over here some models that you think are useful with a small explanation. 
+## Class diagram
+Very high level class diagram. Should cover basic decision on the structure of the app. Can be found and edited in the drive. Use draw.io for editing.
+![class diagram](docs/class diagram.png)
+
+The idea behind all these classes is the following:
+*   Resume - Self explanatory. It is the container that contains all the entries that make up the resume.
+*   Group - Collection of entries, mainly used for the headers in the resume.
+*   Entries - For example the schools and businesses
+*   Items - More detailed information about e.g. the job, such as function description.
+
+
+* * *
 [![MEAN.JS Logo](http://meanjs.org/img/logo-small.png)](http://meanjs.org/)
 
 [![Build Status](https://travis-ci.org/meanjs/mean.svg?branch=master)](https://travis-ci.org/meanjs/mean)
