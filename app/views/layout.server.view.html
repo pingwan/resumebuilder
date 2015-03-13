@@ -46,7 +46,9 @@
 <body class="ng-cloak">
     <div layout="column" layout-fill>
         <md-toolbar>
-            <header data-ng-include="'/modules/core/views/header.client.view.html'" class="md-toolbar-tools"></header>
+            <div class="md-toolbar-tools">
+                <header class="fill-height" flex layout="row" data-ng-include="'/modules/core/views/header.client.view.html'"></header>
+            </div>
         </md-toolbar>
         <md-content class="md-padding">
             {% block content %}{% endblock %}

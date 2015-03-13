@@ -1,4 +1,17 @@
-<a href="/#!/" class="navbar-brand">Resume Builder</a>
+<h2 class="md-toolbar-item">
+    <a href="/#!/" class="navbar-brand">Resume Builder</a>
+</h2>
+
+<span flex></span>
+
+<div class="md-toolbar-item" ui-route="/signup" ng-class="{active:$uiRoute}">
+    <a class="md-button" href="/#!/signup">Sign Up</a>
+</div>
+<div class="md-toolbar-item" ui-route="/signin" ng-class="{active: $uiRoute}">
+    <a class="md-button" href="/#!/signin">Sign In</a>
+</li>
+
+<!--
 <div class="container" data-ng-controller="HeaderController">
 
 	<div class="navbar-header">
@@ -24,9 +37,14 @@
 				<a ng-switch-default href="/#!/{{item.link}}" data-ng-bind="item.title"></a>
 			</li>
 		</ul>
+        <div>
+            <div class="md-toolbar-tools" ui-route="/signup" ng-class="{active:$uiRoute}">
+                <a class="md-button" href="/#!/signup">Sign Up</a>
+            </div>
+        </div>
 		<ul class="nav navbar-nav navbar-right" data-ng-hide="authentication.user">
 			<li ui-route="/signup" ng-class="{active: $uiRoute}">
-				<a href="/#!/signup">Sign Up</a>
+                <a href="/#!/signup">Sign Up</a>
 			</li>
 			<li class="divider-vertical"></li>
 			<li ui-route="/signin" ng-class="{active: $uiRoute}">
@@ -36,7 +54,7 @@
 		<ul class="nav navbar-nav navbar-right" data-ng-show="authentication.user">
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					<!--<span data-ng-bind="authentication.user.displayName"></span> <b class="caret"></b>-->
+					<!--<span data-ng-bind="authentication.user.displayName"></span> <b class="caret"></b>
                     <ng-md-icon icon="person"></ng-md-icon>
 				</a>
 				<ul class="dropdown-menu">
@@ -57,4 +75,5 @@
 			</li>
 		</ul>
 	</nav>
+        -->
 </div>
