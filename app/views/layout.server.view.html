@@ -43,11 +43,25 @@
 	<![endif]-->
 </head>
 
-<body class="ng-cloak">
-    <div layout="column" layout-fill>
+<body class="ng-cloak" layout="row" data-ng-controller="LayoutController">
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="showSidenav">
+        <md-toolbar class="md-theme-indigo">
+            <h1 class="md-toolbar-tools">Sidenav Left</h1>
+        </md-toolbar>
+        <md-content class="md-padding" ng-controller="LeftCtrl">
+            <md-button ng-click="close()" class="md-primary" hide-gt-md>
+                Close Sidenav Left
+            </md-button>
+            <p hide-md show-gt-md>
+                This sidenav is locked open on your device. To go back to the default behavior,
+                narrow your display.
+            </p>
+        </md-content>
+    </md-sidenav>
+    <div layout="column" flex role="main">
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <header class="fill-height" flex layout="row" data-ng-include="'/modules/core/views/header.client.view.html'"></header>
+                <header class="fill-height" flex layout="row" data-ng-controller="HeaderController" data-ng-include="'/modules/core/views/header.client.view.html'"></header>
             </div>
         </md-toolbar>
         <md-content class="md-padding">
