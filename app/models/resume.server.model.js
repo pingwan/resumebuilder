@@ -21,9 +21,13 @@ var ResumeSchema = new Schema({
 		default: Date.now
 	},
 	user: {
-		type: Schema.ObjectId,
-		ref: 'User'
-	}
+        type: Schema.ObjectId,
+        ref: 'User'
+    },
+    entries: [{
+        type: Schema.ObjectId,
+        ref: 'Entry'
+    }]
 });
 
 mongoose.model('Resume', ResumeSchema);

@@ -88,7 +88,10 @@ var UserSchema = new Schema({
 	},
 	resetPasswordExpires: {
 		type: Date
-	}
+	},
+    premiumUntil: {
+        type: Date
+    }
 });
 
 /**

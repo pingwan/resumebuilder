@@ -20,10 +20,13 @@ var ItemSchema = new Schema({
 		type: Date,
 		default: Date.now
 	},
-	user: {
+	entry: {
 		type: Schema.ObjectId,
-		ref: 'User'
-	}
+		ref: 'Entry'
+	},
+    text: {
+        type: String
+    }
 });
 
 mongoose.model('Item', ItemSchema);
