@@ -1,0 +1,19 @@
+<section data-ng-controller="ResumesController" data-ng-init="find()">
+    <div class="page-header">
+        <h1>Resumes</h1>
+    </div>
+    <div class="list-group">
+        <a data-ng-repeat="resume in resumes" data-ng-href="#!/resumes/{{resume._id}}" class="list-group-item">
+			<small class="list-group-item-text">
+				Posted on
+				<span data-ng-bind="resume.created | date:'medium'"></span>
+				by
+				<span data-ng-bind="resume.user.displayName"></span>
+			</small>
+			<h4 class="list-group-item-heading" data-ng-bind="resume.name"></h4>
+        </a>
+    </div>
+    <div class="alert alert-warning text-center" data-ng-hide="!resumes.$resolved || resumes.length">
+    	No Resumes yet, why don't you <a href="/#!/resumes/create">create one</a>?
+    </div>
+</section>
