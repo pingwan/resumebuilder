@@ -42,11 +42,7 @@ var EntrySchema = new Schema({
     group: {
         type: Schema.ObjectId,
         ref: 'Group'
-    },
-    items: [{
-        type: Schema.ObjectId,
-        ref: 'Item'
-    }]
+    }
 });
 
 mongoose.model('Entry', EntrySchema);

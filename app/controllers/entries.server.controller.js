@@ -13,6 +13,7 @@ var mongoose = require('mongoose'),
  */
 exports.create = function(req, res) {
 	var entry = new Entry(req.body);
+    console.log(entry);
 	entry.user = req.user;
 
 	entry.save(function(err) {

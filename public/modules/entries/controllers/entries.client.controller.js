@@ -1,19 +1,39 @@
 'use strict';
 
 // Entries controller
-angular.module('entries').controller('EntriesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Entries', 'Groups', '$log',
-	function($scope, $stateParams, $location, Authentication, Entries, Groups, $log) {
+angular.module('entries').controller('EntriesController', ['$scope', '$log', '$stateParams', '$location', 'Authentication', 'Entries', 'Groups', 'Items',
+	function($scope, $log, $stateParams, $location, Authentication, Entries, Groups, Items) {
 		$scope.authentication = Authentication;
 
 		// Create new Entry
 		$scope.create = function() {
 			// Create new Entry object
 			var entry = new Entries ({
-				name: this.name
+				name: this.name,
+                title: this.title,
+                startDate: Date(this.startDate),
+                endDate: Date(this.endDate),
+                timeSpent: this.timeSpent,
+                group: this.group._id
 			});
 
-			// Redirect after save
 			entry.$save(function(response) {
+                // Save the items
+                $log.log($scope.items);
+                angular.forEach($scope.items, function(item) {
+                    var itm = new Items({
+                        name:item.name,
+                        text:item.text,
+                        entry:response._id
+                    });
+                    itm.$save(function(resp) {
+
+                    }, function(error) {
+                        $scope.error=error.data.message;
+                    });
+                });
+
+                // Redirect after save
 				$location.path('entries/' + response._id);
 
 				// Clear form fields
@@ -71,8 +91,8 @@ angular.module('entries').controller('EntriesController', ['$scope', '$statePara
                 text:""
             }];
             $scope.addItem = function() {
-                var itm = $scope.items.length > 0 ? $scope.items[$scope.items.length-1] : 1;
-                $scope.items.push({
+                var itm = this.items.length > 0 ? this.items[this.items.length-1] : 1;
+                this.items.push({
                     id:itm.id+1,
                     name:"",
                     text:""
@@ -80,7 +100,7 @@ angular.module('entries').controller('EntriesController', ['$scope', '$statePara
             }
 
             $scope.removeItem = function(idx) {
-                $scope.items.splice(idx, 1);
+                this.items.splice(idx, 1);
             }
         }
 	}
