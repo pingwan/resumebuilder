@@ -1,22 +1,58 @@
-<section data-ng-controller="EntriesController" data-ng-init="findOne()">
+<section data-ng-controller="EntriesController" data-ng-init="initUpdate()">
     <div class="page-header">
         <h1>Edit Entry</h1>
     </div>
     <div class="col-md-12">
-        <form class="form-horizontal" data-ng-submit="update()" novalidate>
+        <form class="form-horizontal" novalidate>
             <fieldset>
-                <div class="form-group">
-                    <label class="control-label" for="name">Name</label>
-                    <div class="controls">
-                        <input type="text" data-ng-model="entry.name" id="name" class="form-control" placeholder="Name" required>
+                <md-input-container>
+                    <label>Name</label>
+                    <md-input type="text" data-ng-model="entry.name" id="name" required></md-input>
+                </md-input-container>
+                <md-input-container>
+                    <label>Title</label>
+                    <md-input type="text" data-ng-model="entry.title" id="title" required></md-input>
+                </md-input-container>
+                <md-select data-ng-model="entry.group" id="group" style="width:100%">
+                    <md-select-label>{{group?group.name:"Group"}}</md-select-label>
+                    <md-option data-ng-value="group._id" ng-repeat="group in groups">{{group.name}}</md-option>
+                </md-select>
+                <div layout="row">
+                    <md-input-container flex="50">
+                        <label>Start date</label>
+                        <md-input type="text" data-ng-model="entry.startDate" id="startDate" required></md-input>
+                    </md-input-container>
+                    <md-input-container flex="50">
+                        <label>End date</label>
+                        <md-input type="text" data-ng-model="entry.endDate" id="endDate" required></md-input>
+                    </md-input-container>
+                </div>
+                <md-input-container>
+                    <label>Time spent</label>
+                    <md-input type="text" data-ng-model="entry.timeSpent" id="timeSpent" required></md-input>
+                </md-input-container>
+                <fieldset>
+                    <legend>Description</legend>
+                    <div layout="row" data-ng-repeat="item in items">
+                        <md-input-container flex="20">
+                            <label>Name</label>
+                            <md-input type="text" data-ng-model="item.name" id="name"></md-input>
+                        </md-input-container>
+                        <md-input-container flex="79">
+                            <label>Text</label>
+                            <md-input type="text" data-ng-model="item.text" id="text"></md-input>
+                        </md-input-container>
+                        <md-button ng-click="removeItem($index)"><ng-md-icon icon="close"></ng-md-icon> </md-button>
                     </div>
+                    <div layout="row" layout-align="end">
+                        <md-button ng-click="addItem()">Add line</md-button>
+                    </div>
+                </fieldset>
+
+                <md-button class="md-raised md-primary" ng-click="update()">Save</md-button>
+                <div data-ng-show="error" class="text-danger">
+                    <strong data-ng-bind="error"></strong>
                 </div>
-                <div class="form-group">
-                    <input type="submit" value="Update" class="btn btn-default">
-                </div>
-				<div data-ng-show="error" class="text-danger">
-					<strong data-ng-bind="error"></strong>
-				</div>
             </fieldset>
         </form>
     </div>

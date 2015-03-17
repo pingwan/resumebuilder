@@ -19,7 +19,6 @@ angular.module('entries').controller('EntriesController', ['$scope', '$log', '$s
 
 			entry.$save(function(response) {
                 // Save the items
-                $log.log($scope.items);
                 angular.forEach($scope.items, function(item) {
                     var itm = new Items({
                         name:item.name,
@@ -64,6 +63,20 @@ angular.module('entries').controller('EntriesController', ['$scope', '$log', '$s
 		$scope.update = function() {
 			var entry = $scope.entry;
 
+            angular.forEach($scope.items, function(item) {
+                if(item._id) {
+                    item.$update();
+                }
+                else{
+                    var itm = new Items({
+                        name:item.name,
+                        text:item.text,
+                        entry:$scope.entry._id
+                    });
+                    itm.$save();
+                }
+            });
+
 			entry.$update(function() {
 				$location.path('entries/' + entry._id);
 			}, function(errorResponse) {
@@ -81,7 +94,15 @@ angular.module('entries').controller('EntriesController', ['$scope', '$log', '$s
 			$scope.entry = Entries.get({ 
 				entryId: $stateParams.entryId
 			});
+            $scope.items = Items.query({
+                entry: $stateParams.entryId
+            })
 		};
+
+        $scope.initUpdate = function() {
+            $scope.init();
+            $scope.findOne();
+        }
 
         $scope.init = function() {
             $scope.groups = Groups.query();
@@ -100,7 +121,11 @@ angular.module('entries').controller('EntriesController', ['$scope', '$log', '$s
             }
 
             $scope.removeItem = function(idx) {
-                this.items.splice(idx, 1);
+                var item = this.items.splice(idx, 1)[0];
+                if(item._id) {
+                    item.$remove();
+                }
+
             }
         }
 	}
