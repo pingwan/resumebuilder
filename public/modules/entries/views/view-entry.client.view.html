@@ -1,6 +1,24 @@
 <section data-ng-controller="EntriesController" data-ng-init="findOne()">
 	<div class="page-header">
 		<h1 data-ng-bind="entry.name"></h1>
+        <h3 data-ng-bind="entry.title"></h3>
+        <b>Group</b> {{entry.group}} <br>
+        <b>Start date</b> {{entry.startDate | date:"dd-MM-yyyy"}}<br>
+        <b>End date</b> {{entry.endDate | date:"dd-MM-yyyy"}}<br>
+        <h3>Items</h3>
+        <md-list>
+            <md-divider></md-divider>
+            <md-item data-ng-repeat="item in items">
+                <md-item-content>
+                    <div class="md-tile-content">
+                        <h3>{{item.name}}</h3>
+                        <h4>{{item.text}}</h4>
+                    </div>
+                </md-item-content>
+                <md-divider ng-if="!$last"></md-divider>
+            </md-item>
+        </md-list>
+
 	</div>
 	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == entry.user._id))">
 		<a class="btn btn-primary" href="/#!/entries/{{entry._id}}/edit">
