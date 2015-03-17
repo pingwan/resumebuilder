@@ -16,6 +16,12 @@ var EntrySchema = new Schema({
 		required: 'Please fill Entry name',
 		trim: true
 	},
+    title:{
+        type: String,
+        default: '',
+        required: 'Please fill Entry name',
+        trim: true
+    },
     startDate : {
         type: Date
     },
@@ -36,11 +42,7 @@ var EntrySchema = new Schema({
     group: {
         type: Schema.ObjectId,
         ref: 'Group'
-    },
-    items: [{
-        type: Schema.ObjectId,
-        ref: 'Item'
-    }]
+    }
 });
 
 mongoose.model('Entry', EntrySchema);

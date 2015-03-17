@@ -2,17 +2,20 @@
     <div class="page-header">
         <h1>Entries</h1>
     </div>
-    <div class="list-group">
-        <a data-ng-repeat="entry in entries" data-ng-href="#!/entries/{{entry._id}}" class="list-group-item">
-			<small class="list-group-item-text">
-				Posted on
-				<span data-ng-bind="entry.created | date:'medium'"></span>
-				by
-				<span data-ng-bind="entry.user.displayName"></span>
-			</small>
-			<h4 class="list-group-item-heading" data-ng-bind="entry.name"></h4>
+    <md-list>
+        <a data-ng-repeat="entry in entries" data-ng-href="#!/entries/{{entry._id}}">
+        <md-item >
+            <md-item-content>
+                <div class="md-tile-content">
+                    <h3>{{entry.name}}</h3>
+                    <h4>{{entry.title}}</h4>
+                </div>
+            </md-item-content>
+            <md-divider ng-if="!$last"></md-divider>
+        </md-item>
         </a>
-    </div>
+    </md-list>
+
     <div class="alert alert-warning text-center" data-ng-hide="!entries.$resolved || entries.length">
     	No Entries yet, why don't you <a href="/#!/entries/create">create one</a>?
     </div>

@@ -1,19 +1,38 @@
 'use strict';
 
 // Entries controller
-angular.module('entries').controller('EntriesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Entries',
-	function($scope, $stateParams, $location, Authentication, Entries) {
+angular.module('entries').controller('EntriesController', ['$scope', '$log', '$stateParams', '$location', 'Authentication', 'Entries', 'Groups', 'Items',
+	function($scope, $log, $stateParams, $location, Authentication, Entries, Groups, Items) {
 		$scope.authentication = Authentication;
 
 		// Create new Entry
 		$scope.create = function() {
 			// Create new Entry object
 			var entry = new Entries ({
-				name: this.name
+				name: this.name,
+                title: this.title,
+                startDate: Date(this.startDate),
+                endDate: Date(this.endDate),
+                timeSpent: this.timeSpent,
+                group: this.group._id
 			});
 
-			// Redirect after save
 			entry.$save(function(response) {
+                // Save the items
+                angular.forEach($scope.items, function(item) {
+                    var itm = new Items({
+                        name:item.name,
+                        text:item.text,
+                        entry:response._id
+                    });
+                    itm.$save(function(resp) {
+
+                    }, function(error) {
+                        $scope.error=error.data.message;
+                    });
+                });
+
+                // Redirect after save
 				$location.path('entries/' + response._id);
 
 				// Clear form fields
@@ -44,6 +63,20 @@ angular.module('entries').controller('EntriesController', ['$scope', '$statePara
 		$scope.update = function() {
 			var entry = $scope.entry;
 
+            angular.forEach($scope.items, function(item) {
+                if(item._id) {
+                    item.$update();
+                }
+                else{
+                    var itm = new Items({
+                        name:item.name,
+                        text:item.text,
+                        entry:$scope.entry._id
+                    });
+                    itm.$save();
+                }
+            });
+
 			entry.$update(function() {
 				$location.path('entries/' + entry._id);
 			}, function(errorResponse) {
@@ -61,6 +94,39 @@ angular.module('entries').controller('EntriesController', ['$scope', '$statePara
 			$scope.entry = Entries.get({ 
 				entryId: $stateParams.entryId
 			});
+            $scope.items = Items.query({
+                entry: $stateParams.entryId
+            })
 		};
+
+        $scope.initUpdate = function() {
+            $scope.init();
+            $scope.findOne();
+        }
+
+        $scope.init = function() {
+            $scope.groups = Groups.query();
+            $scope.items = [{
+                id:1,
+                name:"",
+                text:""
+            }];
+            $scope.addItem = function() {
+                var itm = this.items.length > 0 ? this.items[this.items.length-1] : 1;
+                this.items.push({
+                    id:itm.id+1,
+                    name:"",
+                    text:""
+                })
+            }
+
+            $scope.removeItem = function(idx) {
+                var item = this.items.splice(idx, 1)[0];
+                if(item._id) {
+                    item.$remove();
+                }
+
+            }
+        }
 	}
 ]);

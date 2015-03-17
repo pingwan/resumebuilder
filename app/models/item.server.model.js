@@ -26,6 +26,10 @@ var ItemSchema = new Schema({
 	},
     text: {
         type: String
+    },
+    user: {
+        type: Schema.ObjectId,
+        ref: 'User'
     }
 });
 
