@@ -1,8 +1,8 @@
 'use strict';
 
 // Entries controller
-angular.module('entries').controller('EntriesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Entries',
-	function($scope, $stateParams, $location, Authentication, Entries) {
+angular.module('entries').controller('EntriesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Entries', 'Groups', '$log',
+	function($scope, $stateParams, $location, Authentication, Entries, Groups, $log) {
 		$scope.authentication = Authentication;
 
 		// Create new Entry
@@ -62,5 +62,26 @@ angular.module('entries').controller('EntriesController', ['$scope', '$statePara
 				entryId: $stateParams.entryId
 			});
 		};
+
+        $scope.init = function() {
+            $scope.groups = Groups.query();
+            $scope.items = [{
+                id:1,
+                name:"",
+                text:""
+            }];
+            $scope.addItem = function() {
+                var itm = $scope.items.length > 0 ? $scope.items[$scope.items.length-1] : 1;
+                $scope.items.push({
+                    id:itm.id+1,
+                    name:"",
+                    text:""
+                })
+            }
+
+            $scope.removeItem = function(idx) {
+                $scope.items.splice(idx, 1);
+            }
+        }
 	}
 ]);

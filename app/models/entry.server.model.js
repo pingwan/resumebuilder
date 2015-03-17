@@ -16,6 +16,12 @@ var EntrySchema = new Schema({
 		required: 'Please fill Entry name',
 		trim: true
 	},
+    title:{
+        type: String,
+        default: '',
+        required: 'Please fill Entry name',
+        trim: true
+    },
     startDate : {
         type: Date
     },
