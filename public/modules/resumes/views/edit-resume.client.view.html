@@ -5,18 +5,27 @@
     <div class="col-md-12">
         <form class="form-horizontal" data-ng-submit="update()" novalidate>
             <fieldset>
-                <div class="form-group">
-                    <label class="control-label" for="name">Name</label>
-                    <div class="controls">
-                        <input type="text" data-ng-model="resume.name" id="name" class="form-control" placeholder="Name" required>
+                <md-input-container>
+                    <label>Name</label>
+                    <md-input type="text" data-ng-model="resume.name" id="name" required></md-input>
+                </md-input-container>
+
+                <fieldset>
+                    <legend>Available items</legend>
+                    <div data-ng-repeat="(key, value) in items | groupBy: 'entry.name'">
+                        <md-subheader class="md-primary">{{key}}</md-subheader>
+                        <md-input-container data-ng-repeat="item in value">
+                            <md-checkbox ng-model="item.checked" aria-label="Checkbox 2">
+                                {{item.name}}
+                            </md-checkbox>
+                        </md-input-container>
                     </div>
+                </fieldset>
+
+                <md-button class="md-raised md-primary" ng-click="update()">Save</md-button>
+                <div data-ng-show="error" class="text-danger">
+                    <strong data-ng-bind="error"></strong>
                 </div>
-                <div class="form-group">
-                    <input type="submit" value="Update" class="btn btn-default">
-                </div>
-				<div data-ng-show="error" class="text-danger">
-					<strong data-ng-bind="error"></strong>
-				</div>
             </fieldset>
         </form>
     </div>

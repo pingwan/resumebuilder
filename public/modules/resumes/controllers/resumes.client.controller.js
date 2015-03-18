@@ -1,15 +1,26 @@
 'use strict';
 
 // Resumes controller
-angular.module('resumes').controller('ResumesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Resumes',
-	function($scope, $stateParams, $location, Authentication, Resumes) {
+angular.module('resumes').controller('ResumesController', ['$scope', '$log', '$stateParams', '$location', 'Authentication', 'Resumes', 'Entries', 'Items',
+	function($scope, $log, $stateParams, $location, Authentication, Resumes, Entries, Items) {
 		$scope.authentication = Authentication;
+
+        $scope.loadData = function() {
+            $scope.items = Items.query();
+        };
 
 		// Create new Resume
 		$scope.create = function() {
+            var includeditems = [];
+            angular.forEach($scope.items, function(item) {
+                if(item.checked)
+                    includeditems.push(item._id);
+            });
+
 			// Create new Resume object
 			var resume = new Resumes ({
-				name: this.name
+				name: this.name,
+                items: includeditems
 			});
 
 			// Redirect after save
@@ -43,6 +54,13 @@ angular.module('resumes').controller('ResumesController', ['$scope', '$statePara
 		// Update existing Resume
 		$scope.update = function() {
 			var resume = $scope.resume;
+            resume.items = [];
+            var includeditems = [];
+
+            angular.forEach($scope.items, function(item) {
+                if(item.checked)
+                    resume.items.push(item._id);
+            });
 
 			resume.$update(function() {
 				$location.path('resumes/' + resume._id);
@@ -58,9 +76,23 @@ angular.module('resumes').controller('ResumesController', ['$scope', '$statePara
 
 		// Find existing Resume
 		$scope.findOne = function() {
-			$scope.resume = Resumes.get({ 
+            $scope.loadData();
+			Resumes.get({
 				resumeId: $stateParams.resumeId
-			});
+			}).$promise.then(
+                function(result){
+                    $scope.resume = result;
+                    initCheckboxes();
+                }
+            );
+
+            var initCheckboxes = function() {
+                for (var i = 0; i < $scope.items.length; i++) {
+                    if ($scope.resume.items.indexOf($scope.items[i]._id) > -1) {
+                        $scope.items[i].checked = true;
+                    }
+                }
+            }
 		};
 	}
 ]);

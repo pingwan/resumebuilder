@@ -24,9 +24,9 @@ var ResumeSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'User'
     },
-    entries: [{
+    items: [{
         type: Schema.ObjectId,
-        ref: 'Entry'
+        ref: 'Item'
     }]
 });
 
