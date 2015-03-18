@@ -2,6 +2,24 @@
 	<div class="page-header">
 		<h1 data-ng-bind="resume.name"></h1>
 	</div>
+
+    <div data-ng-repeat="(key, value) in resume.items | groupBy: 'entry.name'">
+        <md-subheader class="md-primary">{{key}}</md-subheader>
+        <md-list>
+            <md-divider></md-divider>
+            <md-item data-ng-repeat="item in value">
+                <md-item-content>
+                    <div class="md-tile-content">
+                        <h3>{{item.name}}</h3>
+                        <h4>{{item.text}}</h4>
+                    </div>
+                </md-item-content>
+                <md-divider ng-if="!$last"></md-divider>
+            </md-item>
+        </md-list>
+    </div>
+
+
 	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == resume.user._id))">
 		<a class="btn btn-primary" href="/#!/resumes/{{resume._id}}/edit">
 			<i class="glyphicon glyphicon-edit"></i>

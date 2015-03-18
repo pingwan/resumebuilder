@@ -88,8 +88,10 @@ angular.module('resumes').controller('ResumesController', ['$scope', '$log', '$s
 
             var initCheckboxes = function() {
                 for (var i = 0; i < $scope.items.length; i++) {
-                    if ($scope.resume.items.indexOf($scope.items[i]._id) > -1) {
+                    var index = $scope.resume.items.indexOf($scope.items[i]._id);
+                    if (index > -1) {
                         $scope.items[i].checked = true;
+                        $scope.resume.items[index] = $scope.items[i];
                     }
                 }
             }
