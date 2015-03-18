@@ -14,8 +14,8 @@
                     <legend>Available items</legend>
                     <div data-ng-repeat="(key, value) in items | groupBy: 'entry.name'">
                         <md-subheader class="md-primary">{{key}}</md-subheader>
-                        <md-input-container data-ng-repeat="item in value">
-                            <md-checkbox ng-model="item.checked" aria-label="Checkbox 2">
+                        <md-input-container >
+                            <md-checkbox data-ng-repeat="item in value" ng-model="item.checked" aria-label="Checkbox 2">
                                 {{item.name}}
                             </md-checkbox>
                         </md-input-container>
