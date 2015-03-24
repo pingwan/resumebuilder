@@ -7,6 +7,7 @@ angular.module('resumes').controller('ResumesController', ['$scope', '$log', '$s
 
         $scope.loadData = function() {
             $scope.items = Items.query();
+            $log.log($scope.items);
         };
 
 		// Create new Resume
