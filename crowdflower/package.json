@@ -1,0 +1,17 @@
+{
+  "name": "crowdflower",
+  "version": "0.0.0",
+  "description": "crowdflower node module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "crowdflower"
+  ],
+  "author": "Roeland Oosterloo",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.54.0"
+  }
+}
