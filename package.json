@@ -66,6 +66,8 @@
     "karma-phantomjs-launcher": "~0.1.2",
     "unirest": "^0.4.0",
     "nodehun": "^2.0.4",
-    "natural": "^0.2.1"
+    "natural": "^0.2.1",
+    "node-ner": "0.0.3",
+    "stopwords":"~0.0.4"
   }
 }
