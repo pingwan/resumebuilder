@@ -5,21 +5,41 @@
  */
 var mongoose = require('./errors.server.controller'),
     analysis = require('../../app/libs/textAnalysis'),
-    _ = require('lodash');
+    ArrayStream = require('arraystream'),
+    transform = require('stream-transform'),
+    result = [],
+_ = require('lodash');
 
 /**
  * Execute a search
  */
 exports.exec = function(req, res) {
-    var blocks = [analysis.findSynonyms, analysis.spellCheck, analysis.generateNGrams, analysis.stem];
+    var blocks = [analysis.stem];
     var query = ['I', 'like', 'information', 'retrieval'];
+    var stream = ArrayStream.create(query);
+    result = [];
 
-    blocks.forEach(function(elem, index, array) {
-        elem(query);
-    })
+    stream.pipe(analysis.spellCheck()).pipe(analysis.stem()).pipe(analysis.stopWordsRemoval()).pipe(endpipe()).on('finish', function() {
+        var ngrams = analysis.generateNGrams(result);
+
+        for(var i = 0; i < ngrams.length; i++) {
+            analysis.findSynonyms(ngrams[i], function(data) {
+                console.log(data);
+            });
+        }
+    });
 
     res.jsonp({res: query});
 };
+
+var endpipe = function() {
+    return transform(function(text, callback) {
+        if(text != "")
+            result.push(text);
+
+        callback(null, text);
+    });
+}
 
 /**
  * Entry authorization middleware

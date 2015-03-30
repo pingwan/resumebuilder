@@ -68,6 +68,8 @@
     "nodehun": "^2.0.4",
     "natural": "^0.2.1",
     "node-ner": "0.0.3",
-    "stopwords":"~0.0.4"
+    "stopwords": "~0.0.4",
+    "arraystream": "0.0.5",
+    "stream-transform": "0.0.7"
   }
 }
