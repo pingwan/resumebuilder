@@ -40,8 +40,10 @@ module.exports.InverseDocumentFrequency = InverseDocumentFrequency;
 function IdfGenerator(ngrams, btfs){
     var N = btfs.length;
     var table = {};
-    for(var ngram in ngrams) {
-        for(var btf in btfs) {
+    for(var i=0; i<ngrams.length; i++)) {
+        var ngram = ngrams[i];
+        for(var j=0; j<btfs.length; j++) {
+            var btf = btfs[j];
             if(btf.getOccurrence(ngram)) {
                 table[ngram] = (table[ngram] || 0) + 1;
             }
