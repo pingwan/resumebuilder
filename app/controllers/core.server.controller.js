@@ -24,6 +24,7 @@ exports.reindex = function(req,res){
     });*/
 
     var globalNGrams = [];
+    var idfScore = [];
     var btfs = [];
     var tfs = [];
 
@@ -32,44 +33,48 @@ exports.reindex = function(req,res){
 
             var text = [];
 
-            console.log(docs[0]['_doc']['items']);
+            var totalDocs = docs; //all the docs
 
-            var items = docs[0]['_doc']['items'];
+            totalDocs.forEach(function(val,index){ //loop through every docs to get the items
+                var items = val['items'];
 
+                items.forEach(function(val,index){ //loop through every item to get the entry text.
+                    text.push(val['text']);
+                    console.log(val['text']);
+                });
 
-            items.forEach(function(val,index){
-               /*Item.findOne(val).populate('entry').exec(function(err,entry){
-                    console.dir(entry);
-               });*/
+                var docText =  text.join(' '); //created one big string from the entry text
 
-                text.push(val.text);
+                /** TODO  Perform the textanalysis on the docText right here! :) **/
+
+                var ngram = NGrams.bigrams(docText);
+                var ov = new vsm.OccurrenceVector();
+                ov.addTerms(ngram,1);
+                tfs.push(ov);
+
+                var bf = new vsm.BooleanFrequency();
+                bf.OccurrenceVector = ov;
+                btfs.push(bf);
+
+                /** TODO so concatineer je volgens mij all de ngrams naar de globalNgrams maar als je dit uncomment dan crasht ie **/
+                //globalNGrams = globalNGrams.concat(ngram);
+
 
             });
 
-           var docText =  text.join(' ');
+            /** all docs are finished processing here! **/
 
-            /** TODO  Perform the textanalysis right here! :) **/
+            // create the IDF generator
+            var idfObj = vsm.IdfGenerator(globalNGrams,btfs);
+
+            //Calculate the tf–idf score for each term, the score will be push to the idfScore array.
+            globalNGrams.forEach(function(val,index){
+                idfScore.push(idfObj.getIdf(val));
+            });
 
 
 
-            var ngram = NGrams.bigrams(docText);
 
-            var ov = new vsm.OccurrenceVector();
-            ov.addTerms(ngram,1);
-            tfs.push(ov);
-            /** TODO save to global scope **/
-
-            var bf = new vsm.BooleanFrequency();
-            bf.OccurrenceVector = ov;
-            btfs.push(bf);
-
-            /** TODO ngram to global ngramlist **/
-            globalNGrams.concat(ngram);
-
-            // keep track of amt processed docs
-            // if amt == all_docs
-            // generate and IDF and each tf-idf.
-            //
 
 
 
