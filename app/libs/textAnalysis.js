@@ -4,7 +4,6 @@ var unirest = require('unirest');
 var natural = require('natural');
 var transform = require('stream-transform');
 var NGrams = natural.NGrams;
-var ArrayStream = require('arraystream');
 var nodehun = require('nodehun');
 var affbuf = fs.readFileSync('dict/en_US.aff');
 var dictbuf = fs.readFileSync('dict/en_US.dic');
@@ -15,7 +14,7 @@ var ner = new node_ner({
 });
 var synonyms = {};
 var gngram;
-var n = 0;
+var n;
 var callback;
 
 var findSynonyms = function(ngram, callbackfn) {
@@ -38,19 +37,17 @@ var regen = function() {
         }
     }
 
-    if(n == 2) {
-        var res = [];
+    var res = [];
+    var choices = [];
 
-        var choices = [];
-        for (var i = 0; i < gngram.length; i++) {
-            choices.push(synonyms[gngram[i]]);
-        }
-
-        combinations(choices, function (data) {
-            res.push(data);
-        });
-        callback(res);
+    for (var i = 0; i < gngram.length; i++) {
+        choices.push(synonyms[gngram[i]]);
     }
+
+    combinations(choices, function (data) {
+        res.push(data);
+    });
+    callback(res);
 }
 
 var findSynonym = function(text) {
@@ -66,8 +63,9 @@ var findSynonym = function(text) {
             }
             synonyms[text].push(text);
             n++;
-            regen();
 
+            if(n == 2)
+                regen();
         }
     );
 };
