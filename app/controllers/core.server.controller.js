@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
     errorHandler = require('./errors.server.controller'),
     Resume = mongoose.model('Resume'),
     Item = mongoose.model('Item'),
+    WeightVector = mongoose.model('WeightVector'),
     _ = require('lodash');
 
 var NGrams = require('natural').NGrams;
@@ -48,6 +49,7 @@ exports.reindex = function(req,res){
                 /** TODO  Perform the textanalysis on the docText right here! :) **/
 
                 var ngram = NGrams.bigrams(docText);
+
                 var ov = new vsm.OccurrenceVector();
                 ov.addTerms(ngram,1);
                 tfs.push(ov);
@@ -56,34 +58,41 @@ exports.reindex = function(req,res){
                 bf.OccurrenceVector = ov;
                 btfs.push(bf);
 
-                /** TODO so concatineer je volgens mij all de ngrams naar de globalNgrams maar als je dit uncomment dan crasht ie **/
-                //globalNGrams = globalNGrams.concat(ngram);
-
-
+                if(ngram) {
+                    globalNGrams = globalNGrams.concat(ngram);
+                }
             });
 
-            /** all docs are finished processing here! **/
-
-            // create the IDF generator
+            // create the IDF model
             var idfObj = vsm.IdfGenerator(globalNGrams,btfs);
+            var tf_idfs = [];
 
-            //Calculate the tf–idf score for each term, the score will be push to the idfScore array.
-            globalNGrams.forEach(function(val,index){
-                idfScore.push(idfObj.getIdf(val));
-            });
+            // Use the tfs and idf to calculate the tf-idf score for
+            // each term for each document, making up the weights
+            // vector for the vector space model
+            for(var i=0; i<tfs.length; i++){
+                var tf = tfs[i];
+                var doc = totalDocs[i];
+                var weightVector = [];
 
-
-
-
-
-
-
-
-
-
+                globalNGrams.forEach(function(term,index){
+                    weightVector.push(tf.getOccurrence(term) * idfObj.getIdf(term));
+                });
+                var wv = new WeightVector({weights: weightVector,
+                                           resume: doc.id});
+                wv.save(function (err, wv) {
+                    if (err) {
+                        return console.error(err);
+                    }
+                    console.log('saved a WeightVector without errors');
+                });
+            }
+            // TODO save idf in idf mongoose model (as a singleton if possible !)
         }
+    });
+    res.render('index', {
+	user: req.user || null,
+	request: req
     });
 
 }
-
-
