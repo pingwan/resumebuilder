@@ -6,7 +6,7 @@
         <md-button ng-click="close()" class="md-primary" hide-gt-md>
             Close Sidenav Left
         </md-button>
-        <ul data-ng-if="menu.shouldRender(authentication.user);" class="docs-menu">
+        <!--<ul data-ng-if="menu.shouldRender(authentication.user);" class="docs-menu">
         <li class="parent-list-item" data-ng-repeat="item in menu.items | orderBy: 'position'" data-ng-if="item.shouldRender(authentication.user);" ng-switch="item.menuItemType" ui-route="{{item.uiRoute}}" class="{{item.menuItemClass}}" ng-class="{active: ($uiRoute)}">
             <a href="/#!/{{item.link}}" data-ng-bind="item.title"></a>
             <ul class="menu-nested-list">
@@ -15,6 +15,29 @@
                 </li>
             </ul>
         </li>
+        </ul>-->
+
+        <ul class="docs-menu">
+            <ul class="menu-nested-list">
+                <li data-ng-repeat="item in menu.items | orderBy:'position'" data-ng-if="item.shouldRender(authentication.user);" ng-switch="item.menuItemType" ui-route="{{item.uiRoute}}" ng-class="{active: ($uiRoute)}">
+                    <menu-toogle>
+                        <button class="md-button-toggle md-button md-default-theme">
+                            <div layout="row" flex>
+                                {{item.title}}
+                            </div>
+                        </button>
+                        <ul id="docs-menu-layout" class="menu-toggle-list">
+                            <li data-ng-repeat="subitem in item.items | orderBy:'position'">
+                                <menu-link>
+                                    <a class="md-button md-default-theme" ng-href="/#!/{{subitem.link}}">
+                                        <span>{{subitem.title}}</span>
+                                    </a>
+                                </menu-link>
+                            </li>
+                        </ul>
+                    </menu-toogle>
+                </li>
+            </ul>
         </ul>
     </md-content>
 
