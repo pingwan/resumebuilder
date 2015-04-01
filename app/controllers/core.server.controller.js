@@ -32,10 +32,7 @@ exports.reindex = function(req,res){
 
     Resume.find({}).populate('items').exec(function(err,docs){
         if(!err){
-
-
             var totalDocs = docs; //all the docs
-
             totalDocs.forEach(function(val,index){ //loop through every docs to get the items
                 var text = [];
                 var items = val['items'];
@@ -48,7 +45,7 @@ exports.reindex = function(req,res){
 
                 /** TODO  Perform the textanalysis on the docText right here! :) **/
 
-                var ngram = NGrams.bigrams(docText);
+                var ngrams = NGrams.bigrams(docText);
                 //console.log(ngram);
 
                 var ov = new vsm.OccurrenceVector();
@@ -57,12 +54,16 @@ exports.reindex = function(req,res){
 
                 var bf = new vsm.BooleanFrequency();
                 bf.OccurrenceVector = ov;
-                console.log("logloglog" );
+                console.log("logloglog");
                 console.dir(ov);
                 btfs.push(bf);
 
-                if(ngram) {
-                    globalNGrams = globalNGrams.concat(ngram);
+                if(ngrams) {
+                    ngrams.forEach(function(ngram, index){
+                        if(globalNGrams.indexOf(ngram) === -1){
+                            globalNGrams.push(ngram);
+                        }
+                    });
                 }
             });
 
