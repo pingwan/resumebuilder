@@ -45,6 +45,7 @@ exports.reindex = function(req,res){
                 // each term for each document, making up the weights
                 // vector for the vector space model
                 for(var i=0; i<tfs.length; i++){
+                    console.log("Generating wvs in loop");
                     var tf = tfs[i];
                     var doc = totalDocs[i];
                     var weightVector = [];
@@ -116,8 +117,10 @@ exports.reindex = function(req,res){
                         });
                     }
 
+                    console.log("Incrementing doccounter");
                     docCounter++;
                     if(docCounter === amountDocs){
+                        console.log("doccounter complete");
                         generateIDF();
                     }
                 });
@@ -127,6 +130,8 @@ exports.reindex = function(req,res){
 
             });
 
+        } else {
+            console.error(err);
         }
     });
     res.render('index', {
