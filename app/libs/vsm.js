@@ -35,7 +35,6 @@ function InverseDocumentFrequency (lookup, N) {
     this.N = N;
 }
 
-module.exports.InverseDocumentFrequency = InverseDocumentFrequency;
 
 function IdfGenerator(ngrams, btfs){
     var N = btfs.length;
@@ -55,7 +54,6 @@ function IdfGenerator(ngrams, btfs){
     return new InverseDocumentFrequency(table, N);
 }
 
-module.exports.IdfGenerator = IdfGenerator;
 
 // probably very, very slow. Cron job?
 InverseDocumentFrequency.prototype.getIdf = function (term) {
@@ -78,11 +76,11 @@ function OccurrenceVector () {
     this.lookup = {};
 }
 
-module.exports.OccurrenceVector = OccurrenceVector;
 
 OccurrenceVector.prototype.getOccurrence = function (term) {
     return (this.lookup[term] || 0);
 };
+
 
 /* ngrams is formatted like the result value of the natural.NGrams
  function */
@@ -109,7 +107,6 @@ function BooleanFrequency () {
     this.OccurrenceVector = new OccurrenceVector();
 }
 
-module.exports.BooleanFrequency = BooleanFrequency;
 
 BooleanFrequency.prototype.getOccurrence = function (term) {
     return !!(this.OccurrenceVector.getOccurrence(term));
@@ -126,7 +123,6 @@ function AugmentedFrequency (K) {
     this.maxFrequency = 0; // Caching of highest (raw) tf.
 }
 
-module.exports.AugmentedFrequency = AugmentedFrequency;
 
 AugmentedFrequency.prototype.getOccurrence = function (term) {
     if (this.maxFrequency === 0) { // only when no terms have been added
@@ -162,7 +158,6 @@ function calculateRelevance(documentWeightVector, queryWeightVector) {
     }
 }
 
-module.exports.calculateRelevance = calculateRelevance;
 
 function sizeHelper(vector){
     var sizeSquared = 0;
@@ -172,3 +167,12 @@ function sizeHelper(vector){
     vector.forEach(counter);
     return math.sqrt(sizeSquared);
 }
+
+module.exports = {
+    OccurrenceVector: OccurrenceVector,
+    InverseDocumentFrequency: InverseDocumentFrequency,
+    IdfGenerator: IdfGenerator,
+    BooleanFrequency: BooleanFrequency,
+    AugmentedFrequency: AugmentedFrequency,
+    calculateRelevance: calculateRelevance
+};
