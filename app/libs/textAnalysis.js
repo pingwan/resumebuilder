@@ -31,7 +31,7 @@ var execTextAnalysis = function(text, callback) {
         console.log('finish called ' + result);
 
         for(var i = 0; i < ngrams.length; i++) {
-            findSynonyms(ngrams[i], callback);
+//            findSynonyms(ngrams[i], callback);
         }
     });
 }
