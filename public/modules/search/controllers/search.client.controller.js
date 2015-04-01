@@ -24,13 +24,13 @@ angular.module('search').controller('SearchController', ['$scope', 'Authenticati
         // On search submit
         $scope.runSearch = function(){
 
-            alert(this.query);
+            //alert(this.query);
 
-            $http.get('/query/sdfdsfdsf').
+            $http.get('/query/'+this.query).
                 success(function(data, status, headers, config) {
                     // this callback will be called asynchronously
                     // when the response is available
-
+                    console.log(data);
                     $scope.hideResults=false;
                     $scope.hideSearch=true;
 
