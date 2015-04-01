@@ -53,8 +53,9 @@ exports.reindex = function(req,res){
 
                 if(ngrams) {
                     ngrams.forEach(function(ngram, index){
-                        if(globalNGrams.indexOf(ngram) === -1){
-                            globalNGrams.push(ngram);
+                        var currentNgram = ngram.toString();
+                        if(globalNGrams.indexOf(currentNgram) === -1){
+                            globalNGrams.push(currentNgram);
                         }
                     });
                 }
