@@ -43,14 +43,14 @@ function IdfGenerator(ngrams, btfs){
     console.log("IDF gen");
     console.dir(ngrams);
     console.dir(btfs);
-    for(var ngram in ngrams) {
-        for(var btf in btfs) {
+    ngrams.forEach(function(ngram, index){
+        btfs.forEach(function(btf, index){
             if(btf.getOccurrence(ngram)) {
                 console.log("adding ngram+1 to idf");
                 table[ngram] = (table[ngram] || 0) + 1;
             }
-        }
-    }
+        });
+    });
     return new InverseDocumentFrequency(table, N);
 }
 
