@@ -5,7 +5,7 @@ angular.module('core').controller('LayoutController', ['$scope', '$timeout', '$m
         $scope.toggleLeft = function () {
             $mdSidenav('left').toggle()
                 .then(function () {
-                    $log.log("toggle left is done");
+                    $log.log('toggle left is done');
                 });
         };
         $scope.showSidenav = $mdMedia('gt-md');
@@ -18,4 +18,4 @@ angular.module('core').controller('LayoutController', ['$scope', '$timeout', '$m
     $scope.close = function() {
         $mdSidenav('left').close();
     };
-}])
+}]);

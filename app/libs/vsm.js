@@ -13,18 +13,18 @@ var math = require('mathjs');
  Some of the simpler specific implementations of these concepts are
  defined as well.
 
-The 'interface' for tf is as follows;
-- addTerms(ngrams [, weight, callback])
-- getOccurrence(term);
+ The 'interface' for tf is as follows;
+ - addTerms(ngrams [, weight, callback])
+ - getOccurrence(term);
 
-Recommendation from wikipedia for documents:
-tf-idf = raw tf x inverse frequency
-Recommendation from wikipedia for queries:
-tf-idf = double normalization K (K=0.5) x inverse frequency
+ Recommendation from wikipedia for documents:
+ tf-idf = raw tf x inverse frequency
+ Recommendation from wikipedia for queries:
+ tf-idf = double normalization K (K=0.5) x inverse frequency
 
-FIXME: use either ngram (singular) or term for referring to the atomic
-pieces of data that make up both documents and queries.
-*/
+ FIXME: use either ngram (singular) or term for referring to the atomic
+ pieces of data that make up both documents and queries.
+ */
 
 /*
  For building a useful idf, a list of all ngrams in the dataset should
@@ -42,9 +42,6 @@ function IdfGenerator(ngrams, btfs){
     ngrams.forEach(function(ngram, index){
         btfs.forEach(function(btf, index){
             if(btf.getOccurrence(ngram)) {
-                if(table[ngram]){
-                    console.log("Already exists: " + ngram);
-                }
                 table[ngram] = (table[ngram] || 0) + 1;
             }
         });
@@ -56,7 +53,7 @@ function IdfGenerator(ngrams, btfs){
 // probably very, very slow. Cron job?
 InverseDocumentFrequency.prototype.getIdf = function (term) {
     if (this.N === 0){
-        throw new Error("Can't calculate the idf for an empty collection of documents");
+        throw new Error('Can\'t calculate the idf for an empty collection of documents');
     }
     return Math.log(this.N/ ( 1 + this.lookup[term]));
 };
@@ -69,7 +66,7 @@ InverseDocumentFrequency.prototype.getIdf = function (term) {
  the raw tf/idf implementation, or wrapped for modified tf/idf behavior.
 
  N is defined as the amount of words in each n-gram.
-*/
+ */
 function OccurrenceVector () {
     this.lookup = {};
 }
@@ -89,15 +86,17 @@ OccurrenceVector.prototype.addTerms = function (ngrams, weight, callback) {
         // this.lookup[gram] = this.lookup[gram] ? this.lookup[gram]+1 : 1;
         this.lookup[term] = (this.lookup[term] || 0) + weight;
         // Only supply execute callback if it is actually passed via args
-        callback && callback(term, this.lookup[term]);
+        if(typeof (callback) !== 'undefined') {
+            callback(term, this.lookup[term]);
+        }
     }
 };
 
 /*
-BooleanTermFrequency is used as a tf implementation that checks
-whether a particular term or ngram occurs in a document at the
-existence
-*/
+ BooleanTermFrequency is used as a tf implementation that checks
+ whether a particular term or ngram occurs in a document at the
+ existence
+ */
 
 function BooleanFrequency () {
     this.OccurrenceVector = new OccurrenceVector();
@@ -134,13 +133,22 @@ AugmentedFrequency.prototype.addTerms = function (ngrams, weight){
     });
 };
 
+
+function sizeHelper(vector){
+    var sizeSquared = 0;
+    var counter = function(value, index) {
+        sizeSquared += math.pow(value, 2);
+    };
+    vector.forEach(counter);
+    return math.sqrt(sizeSquared);
+}
 /*
  To calculate the relevance of a query to a document, we need the
  weight vector for both the query and document (see comment at top of
  file for calculation). Due to not having negative occurrences, the
  result of this method should be between 0 (no matches) and 1 (exactly
  the same)
-*/
+ */
 function calculateRelevance(documentWeightVector, queryWeightVector) {
     var dot = math.dot(documentWeightVector, queryWeightVector);
     var docVectorLength = sizeHelper(documentWeightVector);
@@ -152,16 +160,6 @@ function calculateRelevance(documentWeightVector, queryWeightVector) {
     } else {
         return dot / denom;
     }
-}
-
-
-function sizeHelper(vector){
-    var sizeSquared = 0;
-    var counter = function(value, index) {
-        sizeSquared += math.pow(value, 2);
-    };
-    vector.forEach(counter);
-    return math.sqrt(sizeSquared);
 }
 
 module.exports = {

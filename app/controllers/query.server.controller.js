@@ -13,8 +13,6 @@ exports.analyse = function(req, res) {
         console.log(data);
     });
 
-    res.jsonp({"hoi":text});
+    res.jsonp({'hoi':text});
 
 };
-
-

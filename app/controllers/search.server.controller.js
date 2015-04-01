@@ -12,10 +12,7 @@ var mongoose = require('./errors.server.controller'),
  * Execute a search
  */
 exports.exec = function(req, res) {
-
-
-
-    res.jsonp({res: query});
+    res.jsonp({res: 'nothing yet'});
 };
 
 /**

@@ -20,45 +20,13 @@ var n;
 var callback;
 var noterms;
 
-var execTextAnalysis = function(text, callback) {
-    var query = text.split(' ');
-    var stream = ArrayStream.create(query);
-    result = [];
-
-    var syn = false;
-
-    stream.pipe(spellCheck()).pipe(stem()).pipe(stopWordsRemoval()).pipe(endpipe()).on('finish', function() {
-        ngrams = generateNGrams(result);
-        noterms = ngrams.length * 2;
-        console.log('finish called ' + result);
-
-        if(syn){
-            for(var i = 0; i < ngrams.length; i++) {
-                findSynonyms(ngrams[i], callback);
-            }
-        } else {
-            callback(ngrams);
-        }
-
-    });
-}
-
 var endpipe = function() {
     return transform(function(text, callback) {
-        if(text !== "")
+        if(text !== '')
             result.push(text);
 
         callback(null, text);
     });
-}
-
-var findSynonyms = function(ngram, callbackfn) {
-    n = 0;
-    callback = callbackfn;
-
-    for(var i = 0; i < ngram.length; i++) {
-        findSynonym(ngram[i]);
-    }
 };
 
 var regen = function() {
@@ -69,6 +37,7 @@ var regen = function() {
         for (var c = 0; c < choices[0].length; c++) {
             combinations(choices.slice(1), callback, (prefix || []).concat(choices[0][c]));
         }
+        return true;
     }
 
     var res = [];
@@ -79,13 +48,10 @@ var regen = function() {
         for (var j = 0; j < ngrams[i].length; j++) {
             choices.push(synonyms[ngrams[i][j]]);
         }
-        combinations(choices, function (data) {
-            res.push(data);
-        });
+        combinations(choices, res.push);
     }
-
     callback(res);
-}
+};
 
 var findSynonym = function(text) {
     synonyms[text] = [];
@@ -93,8 +59,8 @@ var findSynonym = function(text) {
     unirest.get('http://words.bighugelabs.com/api/2/fd7965b33e48895bcf3b30813b28f4a7/' + text + '/json')
         .header('Accept', 'application/json')
         .end(function (result) {
-            if(typeof(result) === "undefined") {
-                throw new Error("No reply from synonym API (check internet connection)");
+            if(typeof(result) === 'undefined') {
+                throw new Error('No reply from synonym API (check internet connection)');
             }
 
             var body = result.body ? JSON.parse(result.body): undefined;
@@ -103,26 +69,20 @@ var findSynonym = function(text) {
                 synonyms[text] = res.splice(0, 3);
             }
             synonyms[text].push(text);
-
-            n++
-            if (n == noterms)
+            n++;
+            if (n === noterms)
                 regen();
         }
     );
-
 };
 
-//assuming text is an array of 'words'
-var spellCheck = function() {
-    return transform(function(text, callback) {
-        dict.spellSuggest(text, function(err, correct, suggestion, origWord) {
-            if(!correct) {
-                text = suggestion;
-            }
+var findSynonyms = function(ngram, callbackfn) {
+    n = 0;
+    callback = callbackfn;
 
-            callback(null, text);
-        })
-    });
+    for(var i = 0; i < ngram.length; i++) {
+        findSynonym(ngram[i]);
+    }
 };
 
 var generateNGrams = function(text) {
@@ -139,20 +99,25 @@ var stem = function() {
 
             if(stems.length > 1)
                 text = stems[1];
-            else if(stems.length == 1)
+            else if(stems.length === 1)
                 text = stems[0];
 
             callback(null, text);
-        })
+        });
     });
-}
+};
 
-var namedEntityRecognition = function(){
-    ner.fromFile('/Users/Ping/Downloads/CrowdFlower.txt', function(entities) {
-        //This only works with a file  This returns a json object with recognized entities.
-        console.log(entities);
-        return entities;
-    })
+//assuming text is an array of 'words'
+var spellCheck = function() {
+    return transform(function(text, callback) {
+        dict.spellSuggest(text, function(err, correct, suggestion, origWord) {
+            if(!correct) {
+                text = suggestion;
+            }
+
+            callback(null, text);
+        });
+    });
 };
 
 var stopWordsRemoval = function() {
@@ -161,13 +126,43 @@ var stopWordsRemoval = function() {
         text = text.toLowerCase();
 
         if(stopwords.indexOf(text) > -1) {
-            callback(null, "");
+            callback(null, '');
         }
         else {
             callback(null, text);
         }
     });
-}
+};
+
+var execTextAnalysis = function(text, callback) {
+    var query = text.split(' ');
+    var stream = ArrayStream.create(query);
+    result = [];
+    var syn = false;
+
+    stream.pipe(spellCheck()).pipe(stem()).pipe(stopWordsRemoval()).pipe(endpipe()).on('finish', function() {
+        ngrams = generateNGrams(result);
+        noterms = ngrams.length * 2;
+        console.log('finish called ' + result);
+
+        if(syn){
+            for(var i = 0; i < ngrams.length; i++) {
+                findSynonyms(ngrams[i], callback);
+            }
+        } else {
+            callback(ngrams);
+        }
+
+    });
+};
+
+var namedEntityRecognition = function(){
+    ner.fromFile('/Users/Ping/Downloads/CrowdFlower.txt', function(entities) {
+        //This only works with a file  This returns a json object with recognized entities.
+        console.log(entities);
+        return entities;
+    });
+};
 
 module.exports = {
     findSynonyms:  findSynonyms,

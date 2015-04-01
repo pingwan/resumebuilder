@@ -17,14 +17,14 @@ exports.index = function(req, res) {
         user: req.user || null,
         request: req
     });
-}
+};
 
 
 exports.reindex = function(req,res){
 
     /*Resume.find().populate('items').exec(function(err,docs){
-       console.dir(docs);
-    });*/
+     console.dir(docs);
+     });*/
 
     var globalNGrams = [];
     var idfScore = [];
@@ -36,24 +36,16 @@ exports.reindex = function(req,res){
             var totalDocs = docs; //all the docs
             var amountDocs = totalDocs.length;
 
-            var generateIDF = function(){
-                // create the IDF model
-                var idfObj = vsm.IdfGenerator(globalNGrams,btfs);
-                var tf_idfs = [];
+            var calcWeightVector = function(ngrams, tf, idf){
+                var weightVector = [];
+                var pushToWeightVector = function(term){
+                    weightVector.push(tf.getOccurrence(term) * idf.getIdf(term));
+                };
+                ngrams.forEach(pushToWeightVector);
+                return weightVector;
+            };
 
-                // Use the tfs and idf to calculate the tf-idf score for
-                // each term for each document, making up the weights
-                // vector for the vector space model
-                for(var i=0; i<tfs.length; i++){
-                    console.log("Generating wvs in loop");
-                    var tf = tfs[i];
-                    var doc = totalDocs[i];
-                    var weightVector = [];
-
-                    globalNGrams.forEach(function(term,index){
-                        weightVector.push(tf.getOccurrence(term) * idfObj.getIdf(term));
-                    });
-                    var wv = new WeightVector({weights: weightVector});
+            var updateWeightVector = function (doc, wv) {
                     wv.save(function (err, wv) {
                         if (err) {
                             return console.error(err);
@@ -64,10 +56,29 @@ exports.reindex = function(req,res){
                             if (err) {
                                 return console.error(err);
                             }
-                            console.log('saved a Doc / WeightVector link without errors');
+                            return true;
                         });
+                        return true;
                     });
+            };
+
+            var generateIDF = function(){
+                // create the IDF model
+                var idfObj = vsm.IdfGenerator(globalNGrams,btfs);
+                var tf_idfs = [];
+
+                // Use the tfs and idf to calculate the tf-idf score for
+                // each term for each document, making up the weights
+                // vector for the vector space model
+                for(var i=0; i<tfs.length; i++){
+                    console.log('Generating wvs in loop');
+                    var tf = tfs[i];
+                    var doc = totalDocs[i];
+
+                    var wv = new WeightVector({weights: calcWeightVector(globalNGrams, tf, idfObj)});
+                    updateWeightVector(doc, wv);
                 }
+
                 var idfSingleton;
                 Idf.find().exec(function(err, idf) {
                     if (idf.length === 0) {
@@ -81,8 +92,7 @@ exports.reindex = function(req,res){
                         if (err) {
                             return console.error(err);
                         }
-                        //console.dir(idf.lookup);
-                        //console.log('saved idf singleton');
+                        return true;
                     });
                 });
             };
@@ -99,9 +109,8 @@ exports.reindex = function(req,res){
                 var docText =  text.join(' '); //created one big string from the entry text
 
                 /** TODO  Perform the textanalysis on the docText right here! :) **/
-                console.log('Analyzing that text')
                 textAnalyzer.execTextAnalysis(docText, function(ngrams){
-                    console.log("callback");
+                    console.log('callback');
                     var ov = new vsm.OccurrenceVector();
                     ov.addTerms(ngrams,1);
                     tfs.push(ov);
@@ -119,23 +128,20 @@ exports.reindex = function(req,res){
                         });
                     }
 
-                    console.log("Incrementing doccounter");
+                    console.log('Incrementing doccounter');
                     docCounter++;
                     if(docCounter === amountDocs){
-                        console.log("doccounter complete");
+                        console.log('doccounter complete');
                         generateIDF();
                     }
                 });
-
                 var ngrams = NGrams.bigrams(docText);
-                //console.log(ngram);
-
             });
 
         } else {
             console.error(err);
         }
     });
-    res.json({key: 'success'})
+    res.json({key: 'success'});
 
 };
