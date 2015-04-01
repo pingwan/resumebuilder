@@ -1,0 +1,24 @@
+{
+  "name": "occupations",
+  "version": "0.0.0",
+  "description": "Standardized Occupation Code",
+  "main": "index.js",
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.4.x"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "keywords"
+  ],
+  "author": "Roeland Oosterloo",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parse": "^0.1.0",
+    "levenshtein": "^1.0.5",
+    "promise": "^6.1.0",
+    "stream-transform": "0.0.7"
+  }
+}
