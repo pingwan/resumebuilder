@@ -58,6 +58,17 @@ InverseDocumentFrequency.prototype.getIdf = function (term) {
     return Math.log(this.N/ ( 1 + this.lookup[term]));
 };
 
+InverseDocumentFrequency.prototype.getWeightVector = function(tf){
+    var wv;
+    var calcWeight = function(key){
+        wv.push(tf.getOccurrence(key) * this.getIdf(key));
+    };
+
+    Object.keys(this.lookup).forEach(calcWeight);
+    return wv;
+};
+
+
 
 /*
  OccurrenceVector is just a wrapper around a standard JavaScript

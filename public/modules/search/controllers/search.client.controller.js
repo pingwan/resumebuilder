@@ -27,7 +27,7 @@ angular.module('search').controller(
 
              //alert(this.query);
 
-             $http.get('/query/'+this.query).
+             $http.get('/search/'+this.query).
                  success(function(data, status, headers, config) {
                      // this callback will be called asynchronously
                      // when the response is available

@@ -3,6 +3,6 @@
 module.exports = function(app) {
     var search = require('../../app/controllers/search.server.controller');
 
-    app.route('/search').get(search.exec);
+    app.route('/search/:query').get(search.exec);
 
 };
