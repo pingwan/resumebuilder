@@ -40,13 +40,12 @@ function IdfGenerator(ngrams, btfs){
     var N = btfs.length;
     var table = {};
 
-    console.log("IDF gen");
-    console.dir(ngrams);
-    console.dir(btfs);
+//    console.log("IDF gen");
+//    console.dir(ngrams);
+//    console.dir(btfs);
     for(var ngram in ngrams) {
         for(var btf in btfs) {
             if(btf.getOccurrence(ngram)) {
-                console.log("adding ngram+1 to idf");
                 table[ngram] = (table[ngram] || 0) + 1;
             }
         }
@@ -85,8 +84,6 @@ OccurrenceVector.prototype.getOccurrence = function (term) {
 /* ngrams is formatted like the result value of the natural.NGrams
  function */
 OccurrenceVector.prototype.addTerms = function (ngrams, weight, callback) {
-    console.log("Adding terms to ov");
-    console.dir(ngrams);
     for(var i = 0; i< ngrams.length; i++) {
         var term = ngrams[i];
         // Could also be:

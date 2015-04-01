@@ -45,12 +45,11 @@ exports.reindex = function(req,res){
                 });
 
                 var docText =  text.join(' '); //created one big string from the entry text
-                console.log("Doctext: " + docText);
 
                 /** TODO  Perform the textanalysis on the docText right here! :) **/
 
                 var ngram = NGrams.bigrams(docText);
-                console.log(ngram);
+                //console.log(ngram);
 
                 var ov = new vsm.OccurrenceVector();
                 ov.addTerms(ngram,1);
@@ -58,6 +57,8 @@ exports.reindex = function(req,res){
 
                 var bf = new vsm.BooleanFrequency();
                 bf.OccurrenceVector = ov;
+                console.log("logloglog" );
+                console.dir(ov);
                 btfs.push(bf);
 
                 if(ngram) {
@@ -108,8 +109,8 @@ exports.reindex = function(req,res){
                     if (err) {
                         return console.error(err);
                     }
-                    console.dir(idf.lookup);
-                    console.log('saved idf singleton');
+                    //console.dir(idf.lookup);
+                    //console.log('saved idf singleton');
                 });
             });
         }
