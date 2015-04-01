@@ -6,6 +6,7 @@ var fs = require('fs');
 var ld = require('levenshtein');
 var Title = require('./models/title.occupation.model.js');
 var Group = require('./models/group.occupation.model.js');
+var crowdflower = require('crowdflower');
 
 var titles = [];
 var groups = [];
@@ -128,7 +129,7 @@ var getTitleCode = function(title, callback) {
     getTitle(function() {
         var proposal = getMin(title, titles);
         if(proposal.distance > 7 || proposal.distance >= title.length){
-            console.log("crowdflower");
+            crowdflower.postTask({'entry_title':title},callback);
         } else {
             callback(proposal.min);
         }
