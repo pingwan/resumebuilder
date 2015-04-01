@@ -10,6 +10,7 @@ var mongoose = require('mongoose'),
 
 var NGrams = require('natural').NGrams;
 var vsm = require('../libs/vsm');
+var textAnalyzer = require('../libs/textAnalysis.js');
 
 exports.index = function(req, res) {
     res.render('index', {
@@ -33,88 +34,99 @@ exports.reindex = function(req,res){
     Resume.find({}).populate('items').exec(function(err,docs){
         if(!err){
             var totalDocs = docs; //all the docs
+            var amountDocs = totalDocs.length;
+
+            var generateIDF = function(){
+                // create the IDF model
+                var idfObj = vsm.IdfGenerator(globalNGrams,btfs);
+                var tf_idfs = [];
+
+                // Use the tfs and idf to calculate the tf-idf score for
+                // each term for each document, making up the weights
+                // vector for the vector space model
+                for(var i=0; i<tfs.length; i++){
+                    var tf = tfs[i];
+                    var doc = totalDocs[i];
+                    var weightVector = [];
+
+                    globalNGrams.forEach(function(term,index){
+                        weightVector.push(tf.getOccurrence(term) * idfObj.getIdf(term));
+                    });
+                    var wv = new WeightVector({weights: weightVector});
+                    wv.save(function (err, wv) {
+                        if (err) {
+                            return console.error(err);
+                        }
+                        console.log('saved a WeightVector without errors');
+                        doc.weightVector = wv._id;
+                        doc.save(function (err, doc) {
+                            if (err) {
+                                return console.error(err);
+                            }
+                            console.log('saved a Doc / WeightVector link without errors');
+                        });
+                    });
+                }
+                var idfSingleton;
+                Idf.find().exec(function(err, idf) {
+                    if (idf.length === 0) {
+                        idfSingleton = new Idf();
+                    } else {
+                        idfSingleton = idf[0];
+                    }
+                    idfSingleton.N = idfObj.N;
+                    idfSingleton.lookup = idfObj.lookup;
+                    idfSingleton.save(function(err, idfSingleton){
+                        if (err) {
+                            return console.error(err);
+                        }
+                        //console.dir(idf.lookup);
+                        //console.log('saved idf singleton');
+                    });
+                });
+            };
+
+            var docCounter = 0;
             totalDocs.forEach(function(val,index){ //loop through every docs to get the items
                 var text = [];
-                var items = val['items'];
+                var items = val.items;
 
                 items.forEach(function(val,index){ //loop through every item to get the entry text.
-                    text.push(val['text']);
+                    text.push(val.text);
                 });
 
                 var docText =  text.join(' '); //created one big string from the entry text
 
                 /** TODO  Perform the textanalysis on the docText right here! :) **/
+                textAnalyzer.execTextAnalysis(docText, function(ngrams){
+                    var ov = new vsm.OccurrenceVector();
+                    ov.addTerms(ngrams,1);
+                    tfs.push(ov);
+
+                    var bf = new vsm.BooleanFrequency();
+                    bf.OccurrenceVector = ov;
+                    btfs.push(bf);
+
+                    if(ngrams) {
+                        ngrams.forEach(function(ngram, index){
+                            var currentNgram = ngram.toString();
+                            if(globalNGrams.indexOf(currentNgram) === -1){
+                                globalNGrams.push(currentNgram);
+                            }
+                        });
+                    }
+
+                    docCounter++;
+                    if(docCounter === amountDocs){
+                        generateIDF();
+                    }
+                });
 
                 var ngrams = NGrams.bigrams(docText);
                 //console.log(ngram);
 
-                var ov = new vsm.OccurrenceVector();
-                ov.addTerms(ngrams,1);
-                tfs.push(ov);
-
-                var bf = new vsm.BooleanFrequency();
-                bf.OccurrenceVector = ov;
-                console.log("logloglog");
-                console.dir(ov);
-                btfs.push(bf);
-
-                if(ngrams) {
-                    ngrams.forEach(function(ngram, index){
-                        var currentNgram = ngram.toString();
-                        if(globalNGrams.indexOf(currentNgram) === -1){
-                            globalNGrams.push(currentNgram);
-                        }
-                    });
-                }
             });
 
-            // create the IDF model
-            var idfObj = vsm.IdfGenerator(globalNGrams,btfs);
-            var tf_idfs = [];
-
-            // Use the tfs and idf to calculate the tf-idf score for
-            // each term for each document, making up the weights
-            // vector for the vector space model
-            for(var i=0; i<tfs.length; i++){
-                var tf = tfs[i];
-                var doc = totalDocs[i];
-                var weightVector = [];
-
-                globalNGrams.forEach(function(term,index){
-                    weightVector.push(tf.getOccurrence(term) * idfObj.getIdf(term));
-                });
-                var wv = new WeightVector({weights: weightVector});
-                wv.save(function (err, wv) {
-                    if (err) {
-                        return console.error(err);
-                    }
-                    console.log('saved a WeightVector without errors');
-                    doc.weightVector = wv._id;
-                    doc.save(function (err, doc) {
-                        if (err) {
-                            return console.error(err);
-                        }
-                        console.log('saved a Doc / WeightVector link without errors');
-                    });
-                });
-            }
-            var idfSingleton;
-            Idf.find().exec(function(err, idf) {
-                if (idf.length === 0) {
-                    idfSingleton = new Idf();
-                } else {
-                    idfSingleton = idf[0];
-                }
-                idfSingleton.N = idfObj.N;
-                idfSingleton.lookup = idfObj.lookup;
-                idfSingleton.save(function(err, idfSingleton){
-                    if (err) {
-                        return console.error(err);
-                    }
-                    //console.dir(idf.lookup);
-                    //console.log('saved idf singleton');
-                });
-            });
         }
     });
     res.render('index', {
