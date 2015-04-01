@@ -1,0 +1,30 @@
+<section data-ng-controller="SearchController">
+    <div class="page-header">
+        <h1>Search</h1>
+    </div>
+
+    <form ng-hide="hideSearch">
+        <md-content md-theme="docs-dark" class="md-padding" layout="row" layout-sm="column">
+            <!--<md-input-container>
+                <md-input type="text" data-ng-model="query"></md-input>
+            </md-input-container>-->
+            <md-input-container flex>
+                <textarea data-ng-model="query" rows="15" columns="1"></textarea>
+            </md-input-container>
+        </md-content>
+        <button ng-click="runSearch()">Search</button>
+    </form>
+
+
+
+    <div id="resultsContainer" ng-hide="hideResults">
+        <button ng-click="newSearch()">Search again</button>
+        <div ng-repeat="result in results">
+            <div><h2>{{result['name']}} - View resume</h2></div>
+        </div>
+    </div>
+
+
+
+
+</section>
