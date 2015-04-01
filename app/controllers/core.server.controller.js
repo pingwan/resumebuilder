@@ -12,6 +12,13 @@ var NGrams = require('natural').NGrams;
 var vsm = require('../libs/vsm');
 var textAnalyzer = require('../libs/textAnalysis.js');
 
+exports.index = function(req, res) {
+    res.render('index', {
+        user: req.user || null,
+        request: req
+    });
+}
+
 
 exports.reindex = function(req,res){
 
@@ -123,8 +130,8 @@ exports.reindex = function(req,res){
         }
     });
     res.render('index', {
-        user: req.user || null,
+        user:req.user || null,
         request: req
-    });
+    })
 
 };
