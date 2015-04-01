@@ -5,6 +5,7 @@ var mongoose = require('mongoose'),
     Resume = mongoose.model('Resume'),
     Item = mongoose.model('Item'),
     WeightVector = mongoose.model('WeightVector'),
+    Idf = mongoose.model('Idf'),
     _ = require('lodash');
 
 var NGrams = require('natural').NGrams;
@@ -12,10 +13,10 @@ var vsm = require('../libs/vsm');
 
 
 exports.index = function(req, res) {
-	res.render('index', {
-		user: req.user || null,
-		request: req
-	});
+        res.render('index', {
+                user: req.user || null,
+                request: req
+        });
 };
 
 exports.reindex = function(req,res){
@@ -32,23 +33,24 @@ exports.reindex = function(req,res){
     Resume.find({}).populate('items').exec(function(err,docs){
         if(!err){
 
-            var text = [];
 
             var totalDocs = docs; //all the docs
 
             totalDocs.forEach(function(val,index){ //loop through every docs to get the items
+                var text = [];
                 var items = val['items'];
 
                 items.forEach(function(val,index){ //loop through every item to get the entry text.
                     text.push(val['text']);
-                    console.log(val['text']);
                 });
 
                 var docText =  text.join(' '); //created one big string from the entry text
+                console.log("Doctext: " + docText);
 
                 /** TODO  Perform the textanalysis on the docText right here! :) **/
 
                 var ngram = NGrams.bigrams(docText);
+                console.log(ngram);
 
                 var ov = new vsm.OccurrenceVector();
                 ov.addTerms(ngram,1);
@@ -78,21 +80,43 @@ exports.reindex = function(req,res){
                 globalNGrams.forEach(function(term,index){
                     weightVector.push(tf.getOccurrence(term) * idfObj.getIdf(term));
                 });
-                var wv = new WeightVector({weights: weightVector,
-                                           resume: doc.id});
+                var wv = new WeightVector({weights: weightVector});
                 wv.save(function (err, wv) {
                     if (err) {
                         return console.error(err);
                     }
                     console.log('saved a WeightVector without errors');
+                    doc.weightVector = wv._id;
+                    doc.save(function (err, doc) {
+                        if (err) {
+                            return console.error(err);
+                        }
+                        console.log('saved a Doc / WeightVector link without errors');
+                    });
                 });
             }
-            // TODO save idf in idf mongoose model (as a singleton if possible !)
+            var idfSingleton;
+            Idf.find().exec(function(err, idf) {
+                if (idf.length === 0) {
+                    idfSingleton = new Idf();
+                } else {
+                    idfSingleton = idf[0];
+                }
+                idfSingleton.N = idfObj.N;
+                idfSingleton.lookup = idfObj.lookup;
+                idfSingleton.save(function(err, idfSingleton){
+                    if (err) {
+                        return console.error(err);
+                    }
+                    console.dir(idf.lookup);
+                    console.log('saved idf singleton');
+                });
+            });
         }
     });
     res.render('index', {
-	user: req.user || null,
-	request: req
+        user: req.user || null,
+        request: req
     });
 
-}
+};

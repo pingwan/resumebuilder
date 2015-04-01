@@ -4,17 +4,13 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-	Schema = mongoose.Schema;
+    Schema = mongoose.Schema;
 
 /**
  * WeightVector Schema (for vsm)
  */
 var WeightVectorSchema = new Schema({
-    weights: [Number],
-    resume: {
-        type: Schema.ObjectId,
-        ref: 'Resume'
-    }
+    weights: [Number]
 });
 
 mongoose.model('WeightVector', WeightVectorSchema);
