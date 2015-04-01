@@ -1,3 +1,6 @@
+# Downloadlink to the Stanford NER
+http://nlp.stanford.edu/software/stanford-ner-2014-10-26.zip
+
 # Models
 Over here some models that you think are useful with a small explanation. 
 ## Class diagram
