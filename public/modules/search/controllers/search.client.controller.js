@@ -4,7 +4,6 @@ angular.module('search').controller('SearchController', ['$scope', 'Authenticati
     function($scope, Authentication, Menus, $http) {
         $scope.authentication = Authentication;
         $scope.isCollapsed = false;
-        $scope.query = "Describe your ideal candidate";
         $scope.menu = Menus.getMenu('topbar');
         $scope.hideResults = true;
         $scope.hideSearch = false;

@@ -9,16 +9,18 @@
                 <md-input type="text" data-ng-model="query"></md-input>
             </md-input-container>-->
             <md-input-container flex>
-                <textarea data-ng-model="query" rows="15" columns="1"></textarea>
+                <label>Describe your ideal candidate</label>
+                <textarea data-ng-model="query" rows="8" columns="1"></textarea>
+
             </md-input-container>
         </md-content>
-            <md-button class="md-raised md-primary" ng-click="runSearch()">Primary</md-button>
+            <md-button class="md-raised md-primary" ng-click="runSearch()">Find!</md-button>
     </form>
 
 
 
     <div id="resultsContainer" ng-hide="hideResults">
-        <button ng-click="newSearch()">Search again</button>
+        <md-button class="md-raised md-priary" ng-click="newSearch()">Search again</md-button>
         <div ng-repeat="result in results">
             <div><h2>{{result['name']}} - View resume</h2></div>
         </div>
