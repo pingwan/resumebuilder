@@ -43,10 +43,15 @@
 	<![endif]-->
 </head>
 
-<body class="ng-cloak">
-    <div layout="column" layout-fill>
+<body class="ng-cloak" layout="row" data-ng-controller="LayoutController">
+
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="showSidenav" data-ng-show="authentication.user" data-ng-include="'/modules/core/views/sidenav.client.view.html'"></md-sidenav>
+
+    <div layout="column" flex role="main">
         <md-toolbar>
-            <header data-ng-include="'/modules/core/views/header.client.view.html'" class="md-toolbar-tools"></header>
+            <div class="md-toolbar-tools">
+                <header class="fill-height" flex layout="row" data-ng-controller="HeaderController" data-ng-include="'/modules/core/views/header.client.view.html'"></header>
+            </div>
         </md-toolbar>
         <md-content class="md-padding">
             {% block content %}{% endblock %}

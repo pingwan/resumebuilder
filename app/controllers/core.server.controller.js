@@ -12,13 +12,6 @@ var NGrams = require('natural').NGrams;
 var vsm = require('../libs/vsm');
 
 
-exports.index = function(req, res) {
-        res.render('index', {
-                user: req.user || null,
-                request: req
-        });
-};
-
 exports.reindex = function(req,res){
 
     /*Resume.find().populate('items').exec(function(err,docs){

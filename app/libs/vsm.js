@@ -39,7 +39,6 @@ function InverseDocumentFrequency (lookup, N) {
 function IdfGenerator(ngrams, btfs){
     var N = btfs.length;
     var table = {};
-
     ngrams.forEach(function(ngram, index){
         btfs.forEach(function(btf, index){
             if(btf.getOccurrence(ngram)) {
