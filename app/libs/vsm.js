@@ -43,6 +43,9 @@ function IdfGenerator(ngrams, btfs){
     ngrams.forEach(function(ngram, index){
         btfs.forEach(function(btf, index){
             if(btf.getOccurrence(ngram)) {
+                if(table[ngram]){
+                    console.log("Already exists: " + ngram);
+                }
                 table[ngram] = (table[ngram] || 0) + 1;
             }
         });

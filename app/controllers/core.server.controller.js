@@ -61,7 +61,7 @@ exports.reindex = function(req,res){
                 console.dir(ov);
                 btfs.push(bf);
 
-                if(ngram) {
+                if(ngram && globalNGrams.indexOf(ngram) === -1) {
                     globalNGrams = globalNGrams.concat(ngram);
                 }
             });
