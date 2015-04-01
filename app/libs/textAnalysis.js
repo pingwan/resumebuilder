@@ -25,14 +25,21 @@ var execTextAnalysis = function(text, callback) {
     var stream = ArrayStream.create(query);
     result = [];
 
+    var syn = false;
+
     stream.pipe(spellCheck()).pipe(stem()).pipe(stopWordsRemoval()).pipe(endpipe()).on('finish', function() {
         ngrams = generateNGrams(result);
         noterms = ngrams.length * 2;
         console.log('finish called ' + result);
 
-        for(var i = 0; i < ngrams.length; i++) {
-//            findSynonyms(ngrams[i], callback);
+        if(syn){
+            for(var i = 0; i < ngrams.length; i++) {
+                findSynonyms(ngrams[i], callback);
+            }
+        } else {
+            callback(ngrams);
         }
+
     });
 }
 

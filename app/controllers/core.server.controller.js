@@ -99,7 +99,9 @@ exports.reindex = function(req,res){
                 var docText =  text.join(' '); //created one big string from the entry text
 
                 /** TODO  Perform the textanalysis on the docText right here! :) **/
+                console.log('Analyzing that text')
                 textAnalyzer.execTextAnalysis(docText, function(ngrams){
+                    console.log("callback");
                     var ov = new vsm.OccurrenceVector();
                     ov.addTerms(ngrams,1);
                     tfs.push(ov);
@@ -134,9 +136,6 @@ exports.reindex = function(req,res){
             console.error(err);
         }
     });
-    res.render('index', {
-        user:req.user || null,
-        request: req
-    })
+    res.json({key: 'success'})
 
 };
