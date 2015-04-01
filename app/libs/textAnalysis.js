@@ -27,9 +27,8 @@ var execTextAnalysis = function(text, callback) {
 
     stream.pipe(spellCheck()).pipe(stem()).pipe(stopWordsRemoval()).pipe(endpipe()).on('finish', function() {
         ngrams = generateNGrams(result);
-        console.log('finish triggered ' + result);
-        console.log(generateNGrams(result));
         noterms = ngrams.length * 2;
+        console.log('finish called ' + result);
 
         for(var i = 0; i < ngrams.length; i++) {
             findSynonyms(ngrams[i], function(data) {
@@ -41,7 +40,6 @@ var execTextAnalysis = function(text, callback) {
 
 var endpipe = function() {
     return transform(function(text, callback) {
-        console.log('end pipe ' + text);
         if(text !== "")
             result.push(text);
 
@@ -86,7 +84,6 @@ var regen = function() {
 
 var findSynonym = function(text) {
     synonyms[text] = [];
-    console.log("start synonym " + text);
 
     unirest.get('http://words.bighugelabs.com/api/2/fd7965b33e48895bcf3b30813b28f4a7/' + text + '/json')
         .header('Accept', 'application/json')
@@ -97,17 +94,14 @@ var findSynonym = function(text) {
 
             var body = result.body ? JSON.parse(result.body): undefined;
             if (body && body.noun && body.noun.syn) {
-                console.log("end synonym " + text + ': ' + body.noun.syn);
                 var res = body.noun.syn;
                 synonyms[text] = res.splice(0, 3);
             }
             synonyms[text].push(text);
 
             n++
-            if (n == noterms) {
-                console.log("regen called");
+            if (n == noterms)
                 regen();
-            }
         }
     );
 
@@ -117,7 +111,6 @@ var findSynonym = function(text) {
 var spellCheck = function() {
     return transform(function(text, callback) {
         dict.spellSuggest(text, function(err, correct, suggestion, origWord) {
-            console.log('spellcheck ' + correct + ' ' + suggestion + ' ' + origWord);
             if(!correct) {
                 text = suggestion;
             }
@@ -138,7 +131,6 @@ var stem = function() {
             if(err) {
                 console.log(err);
             }
-            console.log('stem ' + text + ' ' + stems);
 
             if(stems.length > 1)
                 text = stems[1];
@@ -164,7 +156,6 @@ var stopWordsRemoval = function() {
         text = text.toLowerCase();
 
         if(stopwords.indexOf(text) > -1) {
-            console.log('stopwords ' + text);
             callback(null, "");
         }
         else {
