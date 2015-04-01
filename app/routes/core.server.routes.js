@@ -5,5 +5,4 @@ module.exports = function(app) {
     var core = require('../../app/controllers/core.server.controller');
     app.route('/reindex').get(core.reindex);
     app.route('/').get(core.index);
-    app.route('/query');
 };
