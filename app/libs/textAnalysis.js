@@ -3,6 +3,8 @@ var fs = require('fs');
 var unirest = require('unirest');
 var natural = require('natural');
 var transform = require('stream-transform');
+var result = [];
+var ArrayStream = require('arraystream');
 var NGrams = natural.NGrams;
 var nodehun = require('nodehun');
 var affbuf = fs.readFileSync('dict/en_US.aff');
@@ -13,12 +15,41 @@ var ner = new node_ner({
     install_path:   'stanford-ner/' // This needs to be locally stored.
 });
 var synonyms = {};
-var gngram;
+var ngrams;
 var n;
 var callback;
+var noterms;
+
+var execTextAnalysis = function(text, callback) {
+    var query = text.split(' ');
+    var stream = ArrayStream.create(query);
+    result = [];
+
+    stream.pipe(spellCheck()).pipe(stem()).pipe(stopWordsRemoval()).pipe(endpipe()).on('finish', function() {
+        ngrams = generateNGrams(result);
+        console.log('finish triggered ' + result);
+        console.log(generateNGrams(result));
+        noterms = ngrams.length * 2;
+
+        for(var i = 0; i < ngrams.length; i++) {
+            findSynonyms(ngrams[i], function(data) {
+                console.log(data);
+            });
+        }
+    });
+}
+
+var endpipe = function() {
+    return transform(function(text, callback) {
+        console.log('end pipe ' + text);
+        if(text !== "")
+            result.push(text);
+
+        callback(null, text);
+    });
+}
 
 var findSynonyms = function(ngram, callbackfn) {
-    gngram = ngram;
     n = 0;
     callback = callbackfn;
 
@@ -40,40 +71,53 @@ var regen = function() {
     var res = [];
     var choices = [];
 
-    for (var i = 0; i < gngram.length; i++) {
-        choices.push(synonyms[gngram[i]]);
+    for (var i = 0; i < ngrams.length; i++) {
+        choices = [];
+        for (var j = 0; j < ngrams[i].length; j++) {
+            choices.push(synonyms[ngrams[i][j]]);
+        }
+        combinations(choices, function (data) {
+            res.push(data);
+        });
     }
 
-    combinations(choices, function (data) {
-        res.push(data);
-    });
     callback(res);
 }
 
 var findSynonym = function(text) {
     synonyms[text] = [];
+    console.log("start synonym " + text);
 
     unirest.get('http://words.bighugelabs.com/api/2/fd7965b33e48895bcf3b30813b28f4a7/' + text + '/json')
         .header('Accept', 'application/json')
         .end(function (result) {
-            var body = JSON.parse(result.body);
-            if(body.noun && body.noun.syn) {
+            if(typeof(result) === "undefined") {
+                throw new Error("No reply from synonym API (check internet connection)");
+            }
+
+            var body = result.body ? JSON.parse(result.body): undefined;
+            if (body && body.noun && body.noun.syn) {
+                console.log("end synonym " + text + ': ' + body.noun.syn);
                 var res = body.noun.syn;
                 synonyms[text] = res.splice(0, 3);
             }
             synonyms[text].push(text);
-            n++;
 
-            if(n == 2)
+            n++
+            if (n == noterms) {
+                console.log("regen called");
                 regen();
+            }
         }
     );
+
 };
 
 //assuming text is an array of 'words'
 var spellCheck = function() {
     return transform(function(text, callback) {
         dict.spellSuggest(text, function(err, correct, suggestion, origWord) {
+            console.log('spellcheck ' + correct + ' ' + suggestion + ' ' + origWord);
             if(!correct) {
                 text = suggestion;
             }
@@ -94,8 +138,13 @@ var stem = function() {
             if(err) {
                 console.log(err);
             }
+            console.log('stem ' + text + ' ' + stems);
 
-            //FIX LATER
+            if(stems.length > 1)
+                text = stems[1];
+            else if(stems.length == 1)
+                text = stems[0];
+
             callback(null, text);
         })
     });
@@ -114,10 +163,13 @@ var stopWordsRemoval = function() {
         var stopwords = require('stopwords').english;
         text = text.toLowerCase();
 
-        if(stopwords.indexOf(text) > -1)
+        if(stopwords.indexOf(text) > -1) {
+            console.log('stopwords ' + text);
             callback(null, "");
-        else
+        }
+        else {
             callback(null, text);
+        }
     });
 }
 
@@ -127,5 +179,6 @@ module.exports = {
     generateNGrams: generateNGrams,
     stem: stem,
     stopWordsRemoval: stopWordsRemoval,
-    namedEntityRecognition: namedEntityRecognition
+    namedEntityRecognition: namedEntityRecognition,
+    execTextAnalysis: execTextAnalysis
 };
