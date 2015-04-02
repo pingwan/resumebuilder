@@ -3,8 +3,10 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('./errors.server.controller'),
+var mongoose = require('mongoose'),
+    errorHandler = require('./errors.server.controller'),
     Idf = mongoose.model('Idf'),
+    Resume = mongoose.model('Resume'),
     vsm = require('../../app/libs/vsm'),
     analysis = require('../../app/libs/textAnalysis'),
     transform = require('stream-transform'),
@@ -42,12 +44,28 @@ var queryWeightVector = function(queryNGrams, callback){
  */
 exports.exec = function(req, res) {
     var query = req.params.query;
-    /*analysis.execTextAnalysis(query, function(ngrams){
+    analysis.execTextAnalysis(query, function(ngrams){
         queryWeightVector(ngrams, function(wv){
-            // get all Resumes, compare wv with each Resume.weightVector (via vsm.calculateRelevance), order output
+            Resume.find({}).populate('weightVector').exec(function(err,resumes){
+                if (err){
+                    console.error(err);
+                } else {
+                    var compare = function(res1, res2){
+                        var rel1 = vsm.calculateRelevance(res1.weightVector, wv);
+                        var rel2 = vsm.calculateRelevance(res2.weightVector, wv);
+                        if (rel1 < rel2){
+                            return -1;
+                        } else if (rel1 > rel2){
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    };
+                    res.jsonp({res: resumes.sort(compare)});
+                }
+            });
         });
-    });*/
-    res.jsonp({res: query});
+    });
 };
 
 /**
