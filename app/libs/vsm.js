@@ -59,7 +59,7 @@ InverseDocumentFrequency.prototype.getIdf = function (term) {
 };
 
 InverseDocumentFrequency.prototype.getWeightVector = function(tf){
-    var wv;
+    var wv = [];
     var calcWeight = function(key){
         wv.push(tf.getOccurrence(key) * this.getIdf(key));
     };
