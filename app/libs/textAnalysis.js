@@ -20,7 +20,16 @@ var n;
 var callback;
 var noterms;
 
+var mutex = 0;
+
 var execTextAnalysis = function(text, callback) {
+    if(mutex !==0) {
+        setTimeout(function() {execTextAnalysis(text, callback);}, 100);
+        return;
+    }
+    // else
+    mutex = 1;
+
     var query = text.split(' ');
     var stream = ArrayStream.create(query);
     result = [];
@@ -39,6 +48,7 @@ var execTextAnalysis = function(text, callback) {
         } else {
             callback(ngrams);
         }
+        mutex = 0; // reset mutex;
 
     });
 }
