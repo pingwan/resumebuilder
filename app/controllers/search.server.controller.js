@@ -17,9 +17,10 @@ var retrieveIdf = function(callback) {
     Idf.find().exec(function(err, idf) {
         if (err) {
             return console.error(err);
-        } else if (idf.length !== 0) {
+        } else if (idf.length !== 1) {
             return console.error(new Error('Multiple IDF\'s found in db.'));
         } else {
+            idf = idf[0];
             var idfWrapper = new vsm.InverseDocumentFrequency(idf.lookup, idf.N);
             callback(idfWrapper);
             return true;
