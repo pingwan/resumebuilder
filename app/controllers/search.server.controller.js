@@ -18,9 +18,10 @@ var retrieveIdf = function(callback) {
         if (err) {
             return console.error(err);
         } else if (idf.length !== 1) {
-            return console.error(new Error('Zero or multiple IDF\'s found in db.'));
+            return console.error(new Error('Multiple IDF\'s found in db.'));
         } else {
-            var idfWrapper = new vsm.InverseDocumentFrequency(idf.lookup, idf.N );
+            idf = idf[0];
+            var idfWrapper = new vsm.InverseDocumentFrequency(idf.lookup, idf.N);
             callback(idfWrapper);
             return true;
         }

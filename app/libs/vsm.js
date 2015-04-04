@@ -60,11 +60,13 @@ InverseDocumentFrequency.prototype.getIdf = function (term) {
 
 InverseDocumentFrequency.prototype.getWeightVector = function(tf){
     var wv = [];
+    var self = this;
+
     var calcWeight = function(key){
-        wv.push(tf.getOccurrence(key) * this.getIdf(key));
+        wv.push(tf.getOccurrence(key) * self.getIdf(key));
     };
 
-    Object.keys(this.table).forEach(calcWeight);
+    Object.keys(this.lookup).forEach(calcWeight);
     return wv;
 };
 
@@ -139,8 +141,9 @@ AugmentedFrequency.prototype.getOccurrence = function (term) {
 };
 
 AugmentedFrequency.prototype.addTerms = function (ngrams, weight){
+    var self = this;
     this.OccurrenceVector.addTerms(ngrams, weight, function(gram, count){
-        this.maxFrequency = Math.max(this.maxFrequency, count);
+        self.maxFrequency = Math.max(self.maxFrequency, count);
     });
 };
 
@@ -161,6 +164,7 @@ function sizeHelper(vector){
  the same)
  */
 function calculateRelevance(documentWeightVector, queryWeightVector) {
+    documentWeightVector = documentWeightVector.weights;
     var dot = math.dot(documentWeightVector, queryWeightVector);
     var docVectorLength = sizeHelper(documentWeightVector);
     var queryVectorLength = sizeHelper(queryWeightVector);

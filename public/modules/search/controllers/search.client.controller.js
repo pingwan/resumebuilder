@@ -2,8 +2,8 @@
 
 angular.module('search').controller(
     'SearchController',
-    ['$scope', 'Authentication', 'Menus','$http',
-     function($scope, Authentication, Menus, $http) {
+    ['$scope', 'Authentication', 'Menus','$http', '$log',
+     function($scope, Authentication, Menus, $http, $log) {
          $scope.authentication = Authentication;
          $scope.isCollapsed = false;
          $scope.menu = Menus.getMenu('topbar');
@@ -19,9 +19,6 @@ angular.module('search').controller(
              $scope.isCollapsed = false;
          });
 
-
-         $scope.results=[{name:'John',resume:'dit is de link naar de resume'}];
-
          // On search submit
          $scope.runSearch = function(){
 
@@ -34,7 +31,7 @@ angular.module('search').controller(
                      console.log(data);
                      $scope.hideResults=false;
                      $scope.hideSearch=true;
-
+                     $scope.results = data.res;
                  }).
                  error(function(data, status, headers, config) {
                      // called asynchronously if an error occurs
