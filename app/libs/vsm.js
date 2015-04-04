@@ -64,7 +64,7 @@ InverseDocumentFrequency.prototype.getWeightVector = function(tf){
         wv.push(tf.getOccurrence(key) * this.getIdf(key));
     };
 
-    Object.keys(this.lookup).forEach(calcWeight);
+    Object.keys(this.table).forEach(calcWeight);
     return wv;
 };
 
