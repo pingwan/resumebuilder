@@ -6,6 +6,7 @@
 var mongoose = require('mongoose'),
     errorHandler = require('./errors.server.controller'),
     Idf = mongoose.model('Idf'),
+    Resume = mongoose.model('Resume'),
     vsm = require('../../app/libs/vsm'),
     analysis = require('../../app/libs/textAnalysis'),
     transform = require('stream-transform'),
@@ -42,6 +43,7 @@ var queryWeightVector = function(queryNGrams, callback){
  */
 exports.exec = function(req, res) {
     var query = req.params.query;
+    console.log(query);
     analysis.execTextAnalysis(query, function(ngrams){
         queryWeightVector(ngrams, function(wv){
             Resume.find({}).populate('weightVector').exec(function(err,resumes){
@@ -59,6 +61,7 @@ exports.exec = function(req, res) {
                             return 0;
                         }
                     };
+                    console.dir(resumes);
                     res.jsonp({res: resumes.sort(compare)});
                 }
             });
