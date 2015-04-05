@@ -55,7 +55,10 @@ InverseDocumentFrequency.prototype.getIdf = function (term) {
     if (this.N === 0){
         throw new Error('Can\'t calculate the idf for an empty collection of documents');
     }
-    return Math.log(this.N/ ( 1 + this.lookup[term]));
+    if(this.lookup[term] === undefined)
+        return 0;
+    else
+        return Math.log(this.N/ (this.lookup[term]));
 };
 
 InverseDocumentFrequency.prototype.getWeightVector = function(tf){
