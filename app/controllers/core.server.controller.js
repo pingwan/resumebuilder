@@ -31,10 +31,12 @@ exports.reindex = function(req,res){
     var btfs = [];
     var tfs = [];
 
-    Resume.find({}).populate('items').exec(function(err,docs){
+    Resume.find({}).populate('items').populate('items.entry').exec(function(err,docs){
         if(!err){
             var totalDocs = docs; //all the docs
             var amountDocs = totalDocs.length;
+
+            console.log(docs[0]);
 
             var calcWeightVector = function(ngrams, tf, idf){
                 var weightVector = [];
@@ -101,41 +103,56 @@ exports.reindex = function(req,res){
             totalDocs.forEach(function(val,index){ //loop through every docs to get the items
                 var text = [];
                 var items = val.items;
+                var itemspopulated = 0;
+                var finalactions = function() {
+                    var docText =  text.join(' '); //created one big string from the entry text
+
+                    /** TODO  Perform the textanalysis on the docText right here! :) **/
+                    textAnalyzer.execTextAnalysis(docText, function(ngrams){
+                        console.log('callback');
+                        var ov = new vsm.OccurrenceVector();
+                        ov.addTerms(ngrams,1);
+                        tfs.push(ov);
+
+                        var bf = new vsm.BooleanFrequency();
+                        bf.OccurrenceVector = ov;
+                        btfs.push(bf);
+
+                        if(ngrams) {
+                            ngrams.forEach(function(ngram, index){
+                                var currentNgram = ngram.toString();
+                                if(globalNGrams.indexOf(currentNgram) === -1){
+                                    globalNGrams.push(currentNgram);
+                                }
+                            });
+                        }
+
+                        console.log('Incrementing doccounter');
+                        docCounter++;
+                        if(docCounter === amountDocs){
+                            console.log('doccounter complete');
+                            generateIDF();
+                        }
+                    });
+                    var ngrams = NGrams.bigrams(docText);
+                }
+
 
                 items.forEach(function(val,index){ //loop through every item to get the entry text.
-                    text.push(val.text);
+                    Item.findOne({_id: val._id}).populate('entry').exec(function(err, item) {
+                        if(err) {
+                            console.log(err);
+                            return;
+                        }
+
+                        text.push(item.entry.name + ' ' + item.entry.title + ' ' + val.name + ' ' + val.text);
+
+                        itemspopulated++;
+                        if(itemspopulated == items.length) {
+                            finalactions();
+                        }
+                    });
                 });
-
-                var docText =  text.join(' '); //created one big string from the entry text
-
-                /** TODO  Perform the textanalysis on the docText right here! :) **/
-                textAnalyzer.execTextAnalysis(docText, function(ngrams){
-                    console.log('callback');
-                    var ov = new vsm.OccurrenceVector();
-                    ov.addTerms(ngrams,1);
-                    tfs.push(ov);
-
-                    var bf = new vsm.BooleanFrequency();
-                    bf.OccurrenceVector = ov;
-                    btfs.push(bf);
-
-                    if(ngrams) {
-                        ngrams.forEach(function(ngram, index){
-                            var currentNgram = ngram.toString();
-                            if(globalNGrams.indexOf(currentNgram) === -1){
-                                globalNGrams.push(currentNgram);
-                            }
-                        });
-                    }
-
-                    console.log('Incrementing doccounter');
-                    docCounter++;
-                    if(docCounter === amountDocs){
-                        console.log('doccounter complete');
-                        generateIDF();
-                    }
-                });
-                var ngrams = NGrams.bigrams(docText);
             });
 
         } else {
