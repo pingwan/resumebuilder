@@ -8,11 +8,13 @@ var Title = require('./models/title.occupation.model.js');
 var Group = require('./models/group.occupation.model.js');
 var crowdflower = require('crowdflower');
 
+// globals
 var titles = [];
 var groups = [];
 
-
+// Writes groups to DB
 var GrouptoDb = transform(function(el, callback) {
+    // Make group from supplied data
     var group = new Group(el);
     group.save(function(err) {
         if(err) {
@@ -23,7 +25,9 @@ var GrouptoDb = transform(function(el, callback) {
     });
     callback(null, JSON.stringify(el));
 });
+// Writes titles to DB
 var TitletoDb = transform(function(el, callback) {
+    // Make title from supplied data
     var title = new Title(el);
 
     title.save(function(err) {
@@ -35,6 +39,7 @@ var TitletoDb = transform(function(el, callback) {
     });
     callback(null, JSON.stringify(el));
 });
+// gets titles either from the db, otherwise from file
 var getTitle = function(callback) {
     Title.find({}, function(err, title){
         // No groups in DB
@@ -46,6 +51,7 @@ var getTitle = function(callback) {
         }
     })
 };
+// gets groups either from the db, otherwise from file
 var getGroup = function(callback) {
     Group.find({}, function(err, grps){
         // No groups in DB
@@ -58,6 +64,7 @@ var getGroup = function(callback) {
     })
 };
 
+// Function to read titles from a file and pipe them to the db
 var readTitleFromFile = function() {
     var parser = parse({delimiter: ','});
     var titleStream = fs.createReadStream(__dirname + "/job titles.csv");
@@ -73,6 +80,7 @@ var readTitleFromFile = function() {
     return titleStream.pipe(parser).pipe(toObj)//.pipe(toDb);
 };
 
+// Function to read groups from a file and pipe them to the db
 var readGroupsFromFile = function() {
     var parser = parse({delimiter:','});
     var groupStream = fs.createReadStream(__dirname+'/job groups.csv');
@@ -88,6 +96,7 @@ var readGroupsFromFile = function() {
     return groupStream.pipe(parser).pipe(toObj);
 };
 
+// Function to find the closes related
 var getMin = function(query, collection) {
     var mindist = 999999;
     var minobj = {min:{code:999999}, distance:9999};
@@ -125,10 +134,11 @@ var getMin = function(query, collection) {
     return minobj;
 };
 
+// get the code that belongs to a title
 var getTitleCode = function(title, callback) {
     getTitle(function() {
         var proposal = getMin(title, titles);
-        if(proposal.distance > 7 || proposal.distance >= title.length){
+        if(proposal.distance > 5 || proposal.distance >= title.length){
             crowdflower.postTask({'entry_title':title},callback);
         } else {
             callback(proposal.min);
@@ -136,17 +146,20 @@ var getTitleCode = function(title, callback) {
     });
 };
 
+// get the code that belongs to a group
 var getGroupCode = function(group, callback) {
     getGroup(function() {
         var proposal = getMin(group, groups);
-        if(proposal.distance > 7 || proposal.distance >= group.length) {
-            console.log("crowdflower");
+        if(proposal.distance > 5 || proposal.distance >= group.length) {
+            callback({message: "Code could not be found"})
         } else {
             callback(proposal.min);
         }
     });
 };
 
+// calculate the resemblance. Each level of the code that is the same will increase the score by one.
+// score from 0 through 4
 var getResemblance = function(code1, code2) {
     var majorGroup1 = code1.slice(0,2);
     var minorGroup1 = code1.slice(2,3);

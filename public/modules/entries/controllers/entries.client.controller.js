@@ -65,6 +65,7 @@ angular.module('entries').controller(
          $scope.update = function() {
              var entry = $scope.entry;
 
+             // update each item
              angular.forEach($scope.items, function(item) {
                  if(item._id) {
                      item.$update();
@@ -101,11 +102,13 @@ angular.module('entries').controller(
              });
          };
 
+         // initialize function for update view
          $scope.initUpdate = function() {
              $scope.init();
              $scope.findOne();
          };
 
+         // initialize
          $scope.init = function() {
              $scope.groups = Groups.query();
              $scope.items = [{
@@ -113,6 +116,7 @@ angular.module('entries').controller(
                  name:'',
                  text:''
              }];
+             // bind enable adding of an item
              $scope.addItem = function() {
                  var itm = this.items.length > 0 ? this.items[this.items.length-1] : 1;
                  this.items.push({
@@ -121,7 +125,7 @@ angular.module('entries').controller(
                      text:''
                  });
              };
-
+             // enable removing of item
              $scope.removeItem = function(idx) {
                  var item = this.items.splice(idx, 1)[0];
                  if(item._id) {
