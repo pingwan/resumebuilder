@@ -22,7 +22,7 @@
     <div id="resultsContainer" ng-hide="hideResults">
         <md-button class="md-raised md-priary" ng-click="newSearch()">Search again</md-button>
         <div ng-repeat="result in results">
-            <div><h2>{{result.name}} - <a href="#!/resumes/{{result._id}}">View resume</a></h2></div>
+            <div><h2>{{result.name}} - <a data-ng-href="#!/resumes/{{result._id}}">View resume</a></h2></div>
         </div>
     </div>
 
