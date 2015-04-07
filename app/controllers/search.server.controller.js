@@ -20,6 +20,7 @@ var retrieveIdf = function(callback) {
         } else if (idf.length !== 1) {
             return console.error(new Error('Multiple IDF\'s found in db.'));
         } else {
+            // unpack array
             idf = idf[0];
             var idfWrapper = new vsm.InverseDocumentFrequency(idf.lookup, idf.N);
             callback(idfWrapper);
@@ -51,6 +52,7 @@ exports.exec = function(req, res) {
                 if (err){
                     console.error(err);
                 } else {
+                    // Rank weight vector angles
                     var compare = function(res1, res2){
                         var rel1 = vsm.calculateRelevance(res1.weightVector, wv);
                         var rel2 = vsm.calculateRelevance(res2.weightVector, wv);

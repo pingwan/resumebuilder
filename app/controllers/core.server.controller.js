@@ -107,13 +107,13 @@ exports.reindex = function(req,res){
                 var finalactions = function() {
                     var docText =  text.join(' '); //created one big string from the entry text
 
-                    /** TODO  Perform the textanalysis on the docText right here! :) **/
                     textAnalyzer.execTextAnalysis(docText, function(ngrams){
                         console.log('callback');
                         var ov = new vsm.OccurrenceVector();
                         ov.addTerms(ngrams,1);
                         tfs.push(ov);
 
+                        // for calculating idfs
                         var bf = new vsm.BooleanFrequency();
                         bf.OccurrenceVector = ov;
                         btfs.push(bf);
@@ -144,7 +144,7 @@ exports.reindex = function(req,res){
                             console.log(err);
                             return;
                         }
-
+                        // index entry names, titles and item text and title
                         text.push(item.entry.name + ' ' + item.entry.title + ' ' + val.name + ' ' + val.text);
 
                         itemspopulated++;
